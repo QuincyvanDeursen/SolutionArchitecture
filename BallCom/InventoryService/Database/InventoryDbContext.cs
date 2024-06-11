@@ -33,6 +33,11 @@ namespace InventoryService.Database
 
             modelBuilder.Entity<Inventory>().HasKey(i => i.Id);
             modelBuilder.Entity<Inventory>().HasData(inventories);
+
+            modelBuilder.Entity<Inventory>()
+                .HasOne<Product>()
+                .WithOne()
+                .HasForeignKey<Inventory>(i => i.ProductId);
         }
     }
 }
