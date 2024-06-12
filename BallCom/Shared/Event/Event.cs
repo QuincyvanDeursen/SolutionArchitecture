@@ -2,9 +2,7 @@
 {
     public abstract class Event
     {
-        public int Id { get; set; }
-        public string EventType { get; set; } = string.Empty;
-        public DateTime EventTimestamp { get;set; }
-        public string Data { get; set; } = string.Empty;
+        public Guid Id { get; } = Guid.NewGuid();
+        public DateTime EventTimestamp { get; } = DateTime.Now;
     }
 }

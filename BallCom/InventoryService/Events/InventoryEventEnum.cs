@@ -2,11 +2,7 @@
 {
     public enum InventoryEventEnum
     {
-        ProductCreated,
-        ProductUpdated,
-        ProductDeleted,
-        InventoryCreated,
-        InventoryUpdated,
-        InventoryDeleted
+        InventoryAdded = 1,
+        InventoryRemoved = 2
     }
 }

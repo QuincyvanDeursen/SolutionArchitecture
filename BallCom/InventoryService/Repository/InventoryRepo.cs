@@ -1,5 +1,6 @@
 ﻿using InventoryService.Database;
 using InventoryService.Domain;
+using InventoryService.Events;
 using InventoryService.Repository.Interface;
 
 namespace InventoryService.Repository
@@ -7,41 +8,46 @@ namespace InventoryService.Repository
     public class InventoryRepo : IInventoryRepo
     {
         private readonly InventoryDbContext _context;
+
         public InventoryRepo(InventoryDbContext context)
         {
             _context = context;
         }
 
-        public IEnumerable<Inventory> GetInventories()
+        public IEnumerable<InventoryEvent> GetEvents(int productId)
         {
-            return _context.Inventories.ToList();
+            return _context.InventoryEvents
+                           .Where(e => e.ProductId == productId)
+                           .OrderBy(e => e.EventTimestamp)
+                           .ToList();
         }
 
-        public Inventory GetInventory(int id)
+        public Inventory GetInventory(int productId)
         {
-            return _context.Inventories.FirstOrDefault(i => i.Id == id);
-        }
+            var events = GetEvents(productId);
+            var inventory = new Inventory { ProductId = productId };
 
-        public void AddInventory(Inventory inventory)
-        {
-            _context.Inventories.Add(inventory);
-            _context.SaveChanges();
-        }
-
-        public void UpdateInventory(Inventory inventory)
-        {
-            _context.Inventories.Update(inventory);
-            _context.SaveChanges();
-        }
-
-        public void DeleteInventory(int id)
-        {
-            var inventory = _context.Inventories.FirstOrDefault(i => i.Id == id);
-            if (inventory != null)
+            foreach (var inventoryEvent in events)
             {
-                _context.Inventories.Remove(inventory);
-                _context.SaveChanges();
+                switch (inventoryEvent.EventType)
+                {
+                    case InventoryEventEnum.InventoryAdded:
+                        inventory.Quantity += inventoryEvent.Quantity;
+                        break;
+                    case InventoryEventEnum.InventoryRemoved:
+                        inventory.Quantity -= inventoryEvent.Quantity;
+                        break;
+                    default:
+                        throw new InvalidOperationException($"Unknown event type: {inventoryEvent.GetType()}");
+                }
             }
+            return inventory;
+        }
+
+        public void SaveEvent(InventoryEvent inventoryEvent)
+        {
+            _context.InventoryEvents.Add(inventoryEvent);
+            _context.SaveChanges();
         }
     }
 }

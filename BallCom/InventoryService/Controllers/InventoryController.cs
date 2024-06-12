@@ -1,4 +1,5 @@
 ﻿using InventoryService.Domain;
+using InventoryService.Events;
 using InventoryService.Repository.Interface;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,9 +17,9 @@ namespace InventoryService.Endpoints
         }
 
         [HttpGet]
-        public IEnumerable<Inventory> Get()
+        public Inventory Get()
         {
-            return _inventoryService.GetInventories();
+            return _inventoryService.GetInventory(1);
         }
 
         [HttpGet]
@@ -28,21 +29,9 @@ namespace InventoryService.Endpoints
         }
 
         [HttpPost]
-        public void Post([FromBody] Inventory inventory)
+        public void Post([FromBody] InventoryEvent inventoryEvent)
         {
-            _inventoryService.AddInventory(inventory);
-        }
-
-        [HttpGet]
-        public void Put([FromBody] Inventory inventory)
-        {
-            _inventoryService.UpdateInventory(inventory);
-        }
-
-        [HttpDelete]
-        public void Delete(int id)
-        {
-            _inventoryService.DeleteInventory(id);
+            _inventoryService.SaveEvent(inventoryEvent);
         }
     }
 }

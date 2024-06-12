@@ -1,13 +1,12 @@
 ﻿using InventoryService.Domain;
+using InventoryService.Events;
 
 namespace InventoryService.Repository.Interface
 {
     public interface IInventoryRepo
     {
-        IEnumerable<Inventory> GetInventories();
-        Inventory GetInventory(int id);
-        void AddInventory(Inventory inventory);
-        void UpdateInventory(Inventory inventory);
-        void DeleteInventory(int id);
+        IEnumerable<InventoryEvent> GetEvents(int productId);
+        void SaveEvent(InventoryEvent inventoryEvent);
+        Inventory GetInventory(int productId);
     }
 }
