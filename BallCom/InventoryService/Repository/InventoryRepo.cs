@@ -1,6 +1,5 @@
 ﻿using InventoryService.Database;
 using InventoryService.Domain;
-using InventoryService.Events;
 using InventoryService.Repository.Interface;
 
 namespace InventoryService.Repository
@@ -14,40 +13,33 @@ namespace InventoryService.Repository
             _context = context;
         }
 
-        public IEnumerable<InventoryEvent> GetEvents(int productId)
+        public IEnumerable<Inventory> GetInventories()
         {
-            return _context.InventoryEvents
-                           .Where(e => e.ProductId == productId)
-                           .OrderBy(e => e.EventTimestamp)
-                           .ToList();
+            return _context.Inventories.ToList();
         }
 
-        public Inventory GetInventory(int productId)
+        public Inventory GetInventory(int id)
         {
-            var events = GetEvents(productId);
-            var inventory = new Inventory { ProductId = productId };
-
-            foreach (var inventoryEvent in events)
-            {
-                switch (inventoryEvent.EventType)
-                {
-                    case InventoryEventEnum.InventoryAdded:
-                        inventory.Quantity += inventoryEvent.Quantity;
-                        break;
-                    case InventoryEventEnum.InventoryRemoved:
-                        inventory.Quantity -= inventoryEvent.Quantity;
-                        break;
-                    default:
-                        throw new InvalidOperationException($"Unknown event type: {inventoryEvent.GetType()}");
-                }
-            }
-            return inventory;
+            return _context.Inventories.First(i => i.Id == id);
         }
 
-        public void SaveEvent(InventoryEvent inventoryEvent)
+        public void SaveInventory(Inventory inventory)
         {
-            _context.InventoryEvents.Add(inventoryEvent);
-            _context.SaveChanges();
+            // Add event to inventoryEvent table for CQRS and Event Sourcing
+            _context.Inventories.Add(inventory);
+
+        }
+
+        public void UpdateInventory(Inventory inventory)
+        {
+            // Add event to inventoryEvent table for CQRS and Event Sourcing
+            _context.Inventories.Update(inventory);
+        }
+
+        public void DeleteInventory(Inventory inventory)
+        {
+            // Add event to inventoryEvent table for CQRS and Event Sourcing
+            _context.Inventories.Remove(inventory);
         }
     }
 }

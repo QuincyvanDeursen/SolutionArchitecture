@@ -1,5 +1,4 @@
 ﻿using InventoryService.Domain;
-using InventoryService.Events;
 using Microsoft.EntityFrameworkCore;
 
 namespace InventoryService.Database
@@ -7,6 +6,7 @@ namespace InventoryService.Database
     public class InventoryDbContext : DbContext
     {
         public DbSet<Product>? Products { get; set; }
+        public DbSet<Inventory> Inventories { get; set; }
         public DbSet<InventoryEvent> InventoryEvents { get; set; }
 
 
@@ -26,12 +26,22 @@ namespace InventoryService.Database
             modelBuilder.Entity<Product>().HasKey(p => p.Id);
             modelBuilder.Entity<Product>().HasData(products);
 
-            base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<InventoryEvent>().ToTable("InventoryEvents");
+            IEnumerable<Inventory> inventories = new List<Inventory>
+            {
+                new Inventory { Id = 1, ProductId = 1, Quantity = 10 },
+                new Inventory { Id = 2, ProductId = 2, Quantity = 20 },
+                new Inventory { Id = 3, ProductId = 3, Quantity = 30 }
+            };
 
-            modelBuilder.Entity<InventoryEvent>()
-                .Property(e => e.EventType)
-                .HasConversion<int>();
+            modelBuilder.Entity<Inventory>().HasKey(i => i.Id);
+            modelBuilder.Entity<Inventory>().HasData(inventories);
+
+            modelBuilder.Entity<InventoryEvent>().HasKey(ie => ie.Id);
+
+            modelBuilder.Entity<Inventory>()
+                .HasOne<Product>()
+                .WithOne()
+                .HasForeignKey<Inventory>(i => i.ProductId);
         }
     }
 }

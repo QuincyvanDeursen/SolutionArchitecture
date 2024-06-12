@@ -1,4 +1,4 @@
-﻿namespace InventoryService.Events
+﻿namespace InventoryService.Domain.Enum
 {
     public enum InventoryEventEnum
     {
