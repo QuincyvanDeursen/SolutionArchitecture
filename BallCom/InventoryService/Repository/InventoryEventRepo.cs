@@ -1,10 +1,10 @@
 ﻿using InventoryService.Database;
-using InventoryService.Domain;
-using InventoryService.Repository.Interface;
+using InventoryService.Events;
+using Shared.Repository.Interface;
 
 namespace InventoryService.Repository
 {
-    public class InventoryEventRepo : IInventoryEventRepo
+    public class InventoryEventRepo : IWriteRepository<InventoryBaseEvent>
     {
         private readonly InventoryDbContext _context;
 
@@ -13,17 +13,14 @@ namespace InventoryService.Repository
             _context = context;
         }
 
-        public void SaveInventory(InventoryEvent inventoryEvent)
+        public void Save(InventoryBaseEvent @event)
         {
-            _context.InventoryEvents.Add(inventoryEvent);
+            throw new NotImplementedException();
         }
 
-        public void UpdateInventory(InventoryEvent inventoryEvent)
+        public void Delete(InventoryBaseEvent @event)
         {
-        }
-
-        public void DeleteInventory(InventoryEvent inventoryEvent)
-        {
+            throw new NotImplementedException();
         }
     }
 }

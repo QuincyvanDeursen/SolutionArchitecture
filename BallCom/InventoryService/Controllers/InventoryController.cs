@@ -1,37 +1,37 @@
 ﻿using InventoryService.Domain;
 using InventoryService.Events;
-using InventoryService.Repository.Interface;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Repository.Interface;
 
 namespace InventoryService.Endpoints
 {
     public class InventoryController : ControllerBase
     {
         private readonly ILogger<InventoryController> _logger;
-        private readonly IInventoryRepo _inventoryService;
+        private readonly IReadRepository<Inventory> _inventoryService;
 
-        public InventoryController(ILogger<InventoryController> logger, IInventoryRepo inventoryService)
+        public InventoryController(ILogger<InventoryController> logger, IReadRepository<Inventory> inventoryService)
         {
             _logger = logger;
             _inventoryService = inventoryService;
         }
 
         [HttpGet]
-        public Inventory Get()
+        public async Task<IEnumerable<Inventory>> Get()
         {
-            return _inventoryService.GetInventory(1);
+            return await _inventoryService.GetAllAsync();
         }
 
         [HttpGet]
-        public Inventory Get(int id)
+        public async Task<Inventory> Get(Guid id)
         {
-            return _inventoryService.GetInventory(id);
+            return await _inventoryService.GetByIdAsync(id);
         }
 
         [HttpPost]
-        public void Post([FromBody] InventoryEvent inventoryEvent)
+        public void Post([FromBody] InventoryBaseEvent inventoryEvent)
         {
-            _inventoryService.SaveEvent(inventoryEvent);
+            // _inventoryService.SaveEvent(inventoryEvent);
         }
     }
 }

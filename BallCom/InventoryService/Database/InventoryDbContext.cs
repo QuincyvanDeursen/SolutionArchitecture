@@ -1,4 +1,5 @@
 ﻿using InventoryService.Domain;
+using InventoryService.Events;
 using Microsoft.EntityFrameworkCore;
 
 namespace InventoryService.Database
@@ -7,7 +8,7 @@ namespace InventoryService.Database
     {
         public DbSet<Product>? Products { get; set; }
         public DbSet<Inventory> Inventories { get; set; }
-        public DbSet<InventoryEvent> InventoryEvents { get; set; }
+        public DbSet<InventoryBaseEvent> InventoryEvents { get; set; }
 
 
         public InventoryDbContext(DbContextOptions<InventoryDbContext> options) : base(options)
@@ -36,7 +37,7 @@ namespace InventoryService.Database
             modelBuilder.Entity<Inventory>().HasKey(i => i.Id);
             modelBuilder.Entity<Inventory>().HasData(inventories);
 
-            modelBuilder.Entity<InventoryEvent>().HasKey(ie => ie.Id);
+            modelBuilder.Entity<InventoryBaseEvent>().HasKey(ie => ie.Id);
 
             modelBuilder.Entity<Inventory>()
                 .HasOne<Product>()

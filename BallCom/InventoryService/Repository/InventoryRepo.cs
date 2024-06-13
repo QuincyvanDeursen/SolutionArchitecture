@@ -1,45 +1,20 @@
 ﻿using InventoryService.Database;
 using InventoryService.Domain;
-using InventoryService.Repository.Interface;
+using Microsoft.EntityFrameworkCore;
+using Shared.Repository.Interface;
 
 namespace InventoryService.Repository
 {
-    public class InventoryRepo : IInventoryRepo
+    public class InventoryRepo(InventoryDbContext context) : IReadRepository<Inventory>
     {
-        private readonly InventoryDbContext _context;
-
-        public InventoryRepo(InventoryDbContext context)
+        public async Task<Inventory> GetByIdAsync(Guid id)
         {
-            _context = context;
+            return await context.Inventories.FindAsync(id);
         }
 
-        public IEnumerable<Inventory> GetInventories()
+        public async Task<IEnumerable<Inventory>> GetAllAsync()
         {
-            return _context.Inventories.ToList();
-        }
-
-        public Inventory GetInventory(int id)
-        {
-            return _context.Inventories.First(i => i.Id == id);
-        }
-
-        public void SaveInventory(Inventory inventory)
-        {
-            // Add event to inventoryEvent table for CQRS and Event Sourcing
-            _context.Inventories.Add(inventory);
-
-        }
-
-        public void UpdateInventory(Inventory inventory)
-        {
-            // Add event to inventoryEvent table for CQRS and Event Sourcing
-            _context.Inventories.Update(inventory);
-        }
-
-        public void DeleteInventory(Inventory inventory)
-        {
-            // Add event to inventoryEvent table for CQRS and Event Sourcing
-            _context.Inventories.Remove(inventory);
+            return await context.Inventories.ToListAsync();
         }
     }
 }

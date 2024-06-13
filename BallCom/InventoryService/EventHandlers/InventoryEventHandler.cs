@@ -1,24 +1,19 @@
 ﻿using InventoryService.Domain;
-using InventoryService.Domain.Enum;
-using Shared.EventHandler;
+using InventoryService.Events;
+using Shared.EventSourcing.Interfaces;
 
 namespace InventoryService.EventHandlers
 {
-    public class InventoryEventHandler : EventSourceHandler<InventoryEvent>
+    public class InventoryEventHandler
     {
-        public override void Handle(InventoryEvent @event)
+        public void Handle(InventoryCreatedEvent @event)
         {
-            switch (@event.EventType)
-            {
-                case InventoryEventEnum.InventoryAdded:
-                    // Add inventory
-                    break;
-                case InventoryEventEnum.InventoryRemoved:
-                    // Remove inventory
-                    break;
-                default:
-                    break;
-            }
+            // SaveInventory(@event);
+        }
+
+        public void Handle(InventoryRemoveEvent @event)
+        {
+            // SaveInventory(@event);
         }
     }
 }

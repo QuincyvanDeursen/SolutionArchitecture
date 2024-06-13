@@ -1,9 +1,11 @@
 using InventoryService.Database;
 using InventoryService.Repository;
-using InventoryService.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
+using InventoryService.Domain;
+using InventoryService.Events;
+using Shared.Repository.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +14,8 @@ var connectionString = builder.Configuration.GetConnectionString("Default");
 builder.Services.AddDbContext<InventoryDbContext>(
     options => options.UseSqlServer(connectionString));
 
-builder.Services.AddScoped<IInventoryRepo, InventoryRepo>();
+builder.Services.AddScoped<IReadRepository<Inventory>, InventoryRepo>();
+builder.Services.AddScoped<IWriteRepository<InventoryBaseEvent>, InventoryEventRepo>();
 
 builder.Services.AddControllers();
 
