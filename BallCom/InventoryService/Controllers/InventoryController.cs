@@ -1,5 +1,5 @@
 ﻿using InventoryService.Domain;
-using InventoryService.Events;
+//using InventoryService.Events;
 using InventoryService.Repository.Interface;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,7 +31,7 @@ namespace InventoryService.Endpoints
         [HttpPost]
         public void Post([FromBody] InventoryEvent inventoryEvent)
         {
-            _inventoryService.SaveEvent(inventoryEvent);
+            //_inventoryService.SaveEvent(inventoryEvent);
         }
     }
 }
