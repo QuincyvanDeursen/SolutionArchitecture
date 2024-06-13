@@ -40,7 +40,7 @@ public class RabbitMqMessagePublisher : IMessagePublisher
     public async Task PublishAsync<T>(T data, string topic)
     {
         var channel = await _channel.Value;
-        var messageBody = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new EventMessage<T>()
+        var messageBody = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new MessageEventData<T>()
         {
             Data = data,
             Topic = topic
