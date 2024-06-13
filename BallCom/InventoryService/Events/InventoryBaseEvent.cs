@@ -1,5 +1,5 @@
 ﻿using InventoryService.Domain;
-using InventoryService.Visitor.Interfaces;
+using InventoryService.EventHandlers.Interfaces;
 using Shared.EventSourcing;
 
 namespace InventoryService.Events
@@ -8,6 +8,6 @@ namespace InventoryService.Events
     {
         public int ProductId { get; set; }
         public int Quantity { get; set; }
-        public abstract void Accept(IVisitor @event);
+        public abstract void Accept(IInventoryEventHandler @event);
     }
 }

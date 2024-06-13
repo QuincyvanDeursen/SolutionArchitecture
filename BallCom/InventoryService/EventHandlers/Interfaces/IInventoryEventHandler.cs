@@ -1,9 +1,9 @@
 ﻿using InventoryService.Events;
 using Shared.EventSourcing;
 
-namespace InventoryService.Visitor.Interfaces
+namespace InventoryService.EventHandlers.Interfaces
 {
-    public interface IVisitor
+    public interface IInventoryEventHandler
     {
         void Handle(InventoryCreatedEvent @event);
         void Handle(InventoryRemoveEvent @event);

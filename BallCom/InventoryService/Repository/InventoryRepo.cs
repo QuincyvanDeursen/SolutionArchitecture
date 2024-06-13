@@ -16,5 +16,33 @@ namespace InventoryService.Repository
         {
             return await context.Inventories.ToListAsync();
         }
+
+        public async Task CreateAsync(Inventory entity)
+        {
+            var oldInventory = await context.Inventories.FirstOrDefaultAsync(x => x.Id == entity.Id);
+
+            if (oldInventory != null)
+            {
+                oldInventory.Quantity += entity.Quantity;
+            }
+            else
+            {
+                context.Inventories.Add(entity);
+            }
+
+            await context.SaveChangesAsync();
+        }
+
+        public async Task RemoveAsync(Inventory entity)
+        {
+            var oldInventory = await context.Inventories.FirstOrDefaultAsync(x => x.Id == entity.Id);
+
+            if (oldInventory != null)
+            {
+                oldInventory.Quantity -= entity.Quantity;
+            }
+
+            await context.SaveChangesAsync();
+        }
     }
 }
