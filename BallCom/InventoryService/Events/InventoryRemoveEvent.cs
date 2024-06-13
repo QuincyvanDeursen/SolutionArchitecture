@@ -1,5 +1,5 @@
 ﻿using InventoryService.Domain;
-using InventoryService.Visitor.Interfaces;
+using InventoryService.EventHandlers.Interfaces;
 using Shared.EventSourcing;
 
 namespace InventoryService.Events
@@ -11,7 +11,7 @@ namespace InventoryService.Events
             ProductId = productId;
             Quantity = quantity;
         }
-        public override void Accept(IVisitor @event)
+        public override void Accept(IInventoryEventHandler @event)
         {
             @event.Handle(this);
         }

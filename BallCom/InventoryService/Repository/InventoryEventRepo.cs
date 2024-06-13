@@ -15,7 +15,7 @@ namespace InventoryService.Repository
 
         public void Save(InventoryBaseEvent @event)
         {
-            throw new NotImplementedException();
+            _context.InventoryEvents.Add(@event);
         }
 
         public void Delete(InventoryBaseEvent @event)

@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using InventoryService.Domain;
+using InventoryService.EventHandlers;
+using InventoryService.EventHandlers.Interfaces;
 using InventoryService.Events;
 using Shared.Repository.Interface;
 
@@ -16,6 +18,7 @@ builder.Services.AddDbContext<InventoryDbContext>(
 
 builder.Services.AddScoped<IReadRepository<Inventory>, InventoryRepo>();
 builder.Services.AddScoped<IWriteRepository<InventoryBaseEvent>, InventoryEventRepo>();
+builder.Services.AddScoped<IInventoryEventHandler, InventoryEventHandler>();
 
 builder.Services.AddControllers();
 
