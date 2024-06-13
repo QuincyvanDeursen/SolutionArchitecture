@@ -1,45 +1,48 @@
 ﻿using InventoryService.Database;
 using InventoryService.Domain;
-using InventoryService.Repository.Interface;
+using Microsoft.EntityFrameworkCore;
+using Shared.Repository.Interface;
 
 namespace InventoryService.Repository
 {
-    public class InventoryRepo : IInventoryRepo
+    public class InventoryRepo(InventoryDbContext context) : IReadRepository<Inventory>
     {
-        private readonly InventoryDbContext _context;
-
-        public InventoryRepo(InventoryDbContext context)
+        public async Task<Inventory> GetByIdAsync(Guid id)
         {
-            _context = context;
+            return await context.Inventories.FindAsync(id);
         }
 
-        public IEnumerable<Inventory> GetInventories()
+        public async Task<IEnumerable<Inventory>> GetAllAsync()
         {
-            return _context.Inventories.ToList();
+            return await context.Inventories.ToListAsync();
         }
 
-        public Inventory GetInventory(int id)
+        public async Task CreateAsync(Inventory entity)
         {
-            return _context.Inventories.First(i => i.Id == id);
+            var oldInventory = await context.Inventories.FirstOrDefaultAsync(x => x.Id == entity.Id);
+
+            if (oldInventory != null)
+            {
+                oldInventory.Quantity += entity.Quantity;
+            }
+            else
+            {
+                context.Inventories.Add(entity);
+            }
+
+            await context.SaveChangesAsync();
         }
 
-        public void SaveInventory(Inventory inventory)
+        public async Task RemoveAsync(Inventory entity)
         {
-            // Add event to inventoryEvent table for CQRS and Event Sourcing
-            _context.Inventories.Add(inventory);
+            var oldInventory = await context.Inventories.FirstOrDefaultAsync(x => x.Id == entity.Id);
 
-        }
+            if (oldInventory != null)
+            {
+                oldInventory.Quantity -= entity.Quantity;
+            }
 
-        public void UpdateInventory(Inventory inventory)
-        {
-            // Add event to inventoryEvent table for CQRS and Event Sourcing
-            _context.Inventories.Update(inventory);
-        }
-
-        public void DeleteInventory(Inventory inventory)
-        {
-            // Add event to inventoryEvent table for CQRS and Event Sourcing
-            _context.Inventories.Remove(inventory);
+            await context.SaveChangesAsync();
         }
     }
 }
