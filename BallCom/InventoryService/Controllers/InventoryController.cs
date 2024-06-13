@@ -1,4 +1,4 @@
-﻿using InventoryService.Domain;
+using InventoryService.Domain;
 using InventoryService.EventHandlers.Interfaces;
 using InventoryService.Events;
 using Microsoft.AspNetCore.Mvc;

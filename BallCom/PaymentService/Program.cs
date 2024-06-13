@@ -1,21 +1,19 @@
 using Microsoft.EntityFrameworkCore;
-using OrderService.Database;
-using OrderService.Repository;
-using OrderService.Repository.Interface;
+using PaymentService.Database;
+using PaymentService.Repository;
+using PaymentService.Repository.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("Default");
-builder.Services.AddDbContext<OrderDbContext>(
+builder.Services.AddDbContext<PaymentDbContext>(
     options => options.UseSqlServer(connectionString));
-builder.Services.AddScoped<IOrderRepo, OrderRepo>();
-builder.Services.AddScoped<IOrderItemRepo, OrderItemRepo>();
+builder.Services.AddScoped<IInvoiceRepo, InvoiceRepo>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 
 var app = builder.Build();
 
