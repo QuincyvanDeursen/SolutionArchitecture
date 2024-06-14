@@ -42,16 +42,19 @@ builder.Services.AddSwaggerGen(
         var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     });
 
+// Run migrations if in production
+if (builder.Environment.IsProduction())
+{
+    using var scope = builder.Services.BuildServiceProvider().CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<CustomerDbContext>();
+    dbContext.Database.Migrate();
+}
+
 var app = builder.Build();
 
 
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
