@@ -14,9 +14,9 @@ namespace OrderService.Database
         {
             IEnumerable<Order> orders = new List<Order>
             {
-                new Order { Id = 1, OrderDate = DateTime.Now, CustomerId = 1, ProductId = 1, PaymentId = 1 },
-                new Order { Id = 2, OrderDate = DateTime.Now, CustomerId = 2, ProductId = 2, PaymentId = 2 },
-                new Order { Id = 3, OrderDate = DateTime.Now, CustomerId = 3, ProductId = 3, PaymentId = 3 },
+                new Order { Id = 1, OrderDate = DateTime.Now, CustomerId = 1, PaymentId = 1 },
+                new Order { Id = 2, OrderDate = DateTime.Now, CustomerId = 2, PaymentId = 2 },
+                new Order { Id = 3, OrderDate = DateTime.Now, CustomerId = 3, PaymentId = 3 },
             };
 
             IEnumerable<OrderItem> orderItems = new List<OrderItem>

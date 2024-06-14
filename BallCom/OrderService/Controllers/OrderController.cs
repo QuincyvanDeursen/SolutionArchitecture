@@ -13,9 +13,10 @@ namespace OrderService.Controllers
         private readonly IOrderRepo _orderRepo; // Mogelijk moet dit de repo service worden ipv db.
 
 
-        public OrderController(ILogger<OrderController> logger, IOrderRepo orderRepo) { 
+        public OrderController(ILogger<OrderController> logger, IOrderRepo orderRepo)
+        { 
         
-                _logger = logger;
+            _logger = logger;
             _orderRepo = orderRepo;
         }
 
@@ -55,7 +56,5 @@ namespace OrderService.Controllers
         {
             _orderRepo.DeleteOrder(_orderRepo.GetOrder(id));
         }
-
-
     }
 }

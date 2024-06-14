@@ -19,6 +19,7 @@ builder.Services.AddDbContext<InventoryDbContext>(
 builder.Services.AddScoped<IReadRepository<Inventory>, InventoryRepo>();
 builder.Services.AddScoped<IWriteRepository<InventoryBaseEvent>, InventoryEventRepo>();
 builder.Services.AddScoped<IInventoryEventHandler, InventoryEventHandler>();
+builder.Services.AddScoped<IProductEventHandler, ProductEventHandler>();
 
 builder.Services.AddControllers();
 
