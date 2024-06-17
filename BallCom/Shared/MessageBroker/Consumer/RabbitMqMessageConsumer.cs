@@ -10,16 +10,16 @@ namespace Shared.MessageBroker.Consumer;
 // TODO: Recreate the plain rabbitmq consumer with multiple routing key support
 public class RabbitMqMessageConsumer : IMessageConsumer
 {
-    private readonly IConnectionFactory _connectionFactory;
+    private readonly IConnectionProvider _connectionProvider;
     private readonly string _exchangeName;
     private readonly string _queueName;
 
     private Lazy<Task<IConnection>> _connection;
     private Lazy<Task<IChannel>> _channel;
 
-    public RabbitMqMessageConsumer(IConnectionFactory connectionFactory, string exchangeName, string queueName)
+    public RabbitMqMessageConsumer(IConnectionProvider connectionProvider, string exchangeName, string queueName)
     {
-        _connectionFactory = connectionFactory;
+        _connectionProvider = connectionProvider;
         _exchangeName = exchangeName;
         _queueName = queueName;
 
@@ -29,12 +29,12 @@ public class RabbitMqMessageConsumer : IMessageConsumer
     
     private async Task<IConnection> CreateConnectionAsync()
     {
-        return await _connectionFactory.CreateConnectionAsync();
+        return await _connectionProvider.GetConnectionAsync();
     }
 
     private async Task<IChannel> CreateChannelAsync()
     {
-        var connection = await _connectionFactory.CreateConnectionAsync();
+        var connection = await _connectionProvider.GetConnectionAsync();
         var channel = await connection.CreateChannelAsync();
         await channel.ExchangeDeclareAsync(exchange: _exchangeName, type: ExchangeType.Topic);
         return channel;
