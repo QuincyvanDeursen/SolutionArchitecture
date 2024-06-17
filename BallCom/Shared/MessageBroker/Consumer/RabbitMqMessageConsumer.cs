@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using Shared.MessageBroker.Connection;
 using Shared.MessageBroker.Consumer.Interfaces;
 
 namespace Shared.MessageBroker.Consumer;

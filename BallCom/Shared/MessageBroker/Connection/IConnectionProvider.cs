@@ -1,6 +1,6 @@
 using RabbitMQ.Client;
 
-namespace Shared.MessageBroker;
+namespace Shared.MessageBroker.Connection;
 
 public interface IConnectionProvider
 {

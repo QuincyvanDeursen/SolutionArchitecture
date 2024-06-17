@@ -11,6 +11,7 @@ using Shared.MessageBroker.Publisher;
 using Shared.MessageBroker.Publisher.Interfaces;
 using OrderService.Services;
 using OrderService.Services.Interface;
+using Shared.MessageBroker.Connection;
 
 var builder = WebApplication.CreateBuilder(args);
 

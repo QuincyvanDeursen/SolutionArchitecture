@@ -10,6 +10,7 @@ using InventoryService.Events;
 using InventoryService.Services.RabbitMQ;
 using RabbitMQ.Client;
 using Shared.MessageBroker;
+using Shared.MessageBroker.Connection;
 using Shared.MessageBroker.Consumer;
 using Shared.MessageBroker.Consumer.Interfaces;
 using Shared.MessageBroker.Publisher;

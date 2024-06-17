@@ -6,6 +6,7 @@ using CustomerService.Repository;
 using CustomerService.Repository.Interfaces;
 using CustomerService.Services.RabbitMQ;
 using Shared.MessageBroker;
+using Shared.MessageBroker.Connection;
 using Shared.MessageBroker.Consumer;
 using Shared.MessageBroker.Consumer.Interfaces;
 using Shared.MessageBroker.Publisher;
