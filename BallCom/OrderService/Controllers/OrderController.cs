@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OrderService.Domain;
 using OrderService.Repository.Interface;
+using Shared.MessageBroker.Publisher.Interfaces;
 
 namespace OrderService.Controllers
 {
@@ -8,14 +9,13 @@ namespace OrderService.Controllers
     [Route("api/[controller]")]
     public class OrderController : ControllerBase
     {
-
         private readonly ILogger<OrderController> _logger;
         private readonly IOrderRepo _orderRepo; // Mogelijk moet dit de repo service worden ipv db.
-
-
-        public OrderController(ILogger<OrderController> logger, IOrderRepo orderRepo) { 
+        private readonly IMessagePublisher _messagePublisher;
         
-                _logger = logger;
+        public OrderController(ILogger<OrderController> logger, IOrderRepo orderRepo, IMessagePublisher messagePublisher) { 
+            _messagePublisher = messagePublisher;
+            _logger = logger;
             _orderRepo = orderRepo;
         }
 
@@ -56,6 +56,10 @@ namespace OrderService.Controllers
             _orderRepo.DeleteOrder(_orderRepo.GetOrder(id));
         }
 
-
+        [HttpGet("Test")]
+        public async Task Test()
+        {
+            await _messagePublisher.PublishAsync(new { Message = "Hello World"}, "order.test");
+        }
     }
 }
