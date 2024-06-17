@@ -5,11 +5,18 @@ using Shared.Repository.Interface;
 
 namespace InventoryService.Repository
 {
-    public class ProductRepo(InventoryDbContext context) : IReadRepository<Product>
+    public class InventoryReadRepo : IReadRepository<Product>
     {
-        public async Task CreateAsync(Product entity)
+        private readonly InventoryDbContext context;
+
+        public InventoryReadRepo(InventoryDbContext context)
         {
-            context.Products.Add(entity);
+            this.context = context ?? throw new ArgumentNullException(nameof(context));
+        }
+
+        public async Task CreateAsync(Product product)
+        {
+            context.Products.Add(product);
             await context.SaveChangesAsync();
         }
 

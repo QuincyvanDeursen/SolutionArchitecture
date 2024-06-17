@@ -7,6 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Repository\Interface\**" />
+    <Compile Remove="Services\Interface\**" />
+    <Content Remove="Repository\Interface\**" />
+    <Content Remove="Services\Interface\**" />
+    <EmbeddedResource Remove="Repository\Interface\**" />
+    <EmbeddedResource Remove="Services\Interface\**" />
+    <None Remove="Repository\Interface\**" />
+    <None Remove="Services\Interface\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.6" />
@@ -19,8 +30,6 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
-    <Folder Include="Repository\Interface\" />
-    <Folder Include="Services\Interface\" />
   </ItemGroup>
 
   <ItemGroup>

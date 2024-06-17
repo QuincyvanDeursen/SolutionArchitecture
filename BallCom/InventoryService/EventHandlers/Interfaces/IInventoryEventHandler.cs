@@ -5,7 +5,7 @@ namespace InventoryService.EventHandlers.Interfaces
 {
     public interface IInventoryEventHandler
     {
-        void Handle(InventoryCreatedEvent @event);
-        void Handle(InventoryRemoveEvent @event);
+        Task Handle(InventoryCreatedEvent @event);
+        Task Handle(InventoryUpdateEvent @event);
     }
 }

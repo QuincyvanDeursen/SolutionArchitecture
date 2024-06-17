@@ -1,30 +1,26 @@
-﻿using InventoryService.Domain;
-using InventoryService.EventHandlers.Interfaces;
+﻿using InventoryService.EventHandlers.Interfaces;
 using InventoryService.Events;
-using Shared.EventSourcing.Interfaces;
 using Shared.Repository.Interface;
 
 namespace InventoryService.EventHandlers
 {
     public class InventoryEventHandler : IInventoryEventHandler
     {
-        private readonly IWriteRepository<InventoryBaseEvent> _repository;
+        private readonly IWriteRepository<InventoryBaseEvent> _inventoryWriteRepo;
 
-        public InventoryEventHandler(IWriteRepository<InventoryBaseEvent> repository)
+        public InventoryEventHandler(IWriteRepository<InventoryBaseEvent> inventoryWriteRepo)
         {
-            _repository = repository;
+            _inventoryWriteRepo = inventoryWriteRepo ?? throw new System.ArgumentNullException(nameof(inventoryWriteRepo));
         }
 
-        public void Handle(InventoryCreatedEvent @event)
+        public async Task Handle(InventoryCreatedEvent @event)
         {
-            // Save the event to seperate table in the database
-            _repository.Save(@event);
+            await _inventoryWriteRepo.Save(@event);
         }
 
-        public void Handle(InventoryRemoveEvent @event)
+        public async  Task Handle(InventoryUpdateEvent @event)
         {
-            // Save the event to seperate table in the database
-            _repository.Save(@event);
+            await _inventoryWriteRepo.Save(@event);
         }
     }
 }
