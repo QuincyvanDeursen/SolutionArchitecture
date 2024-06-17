@@ -1,5 +1,7 @@
-﻿using OrderService.Database;
+﻿using Microsoft.EntityFrameworkCore;
+using OrderService.Database;
 using OrderService.Domain;
+using OrderService.DTO;
 using OrderService.Repository.Interface;
 
 namespace OrderService.Repository
@@ -20,18 +22,37 @@ namespace OrderService.Repository
 
         public Order GetOrder(int id)
         {
-            return _context.Orders.First(i => i.Id == id);
+            return _context.Orders.Include(order => order.OrderItems).First(i => i.Id == id);
+        }
+        public async Task<IEnumerable<OrderDTO>> GetAllOrdersAsync()
+        {
+            var orders = await _context.Orders
+                .Include(o => o.OrderItems)
+                .Select(o => new OrderDTO
+                {
+                    Id = o.Id,
+                    OrderDate = o.OrderDate,
+                    CustomerId = o.CustomerId,
+                    PaymentId = o.PaymentId,
+                    Adress = o.Adress,
+                    Postalcode = o.Postalcode,
+                    City = o.City,
+                    OrderItems = o.OrderItems.Select(oi => new OrderItemDTO
+                    {
+                        Id = oi.Id,
+                        ProductId = oi.ProductId,
+                        Quantity = oi.Quantity
+                    }).ToList()
+                }).ToListAsync();
 
+            return orders;
         }
 
-        public IEnumerable<Order> GetOrders()
+        public async Task<Order> SaveOrder(Order order)
         {
-            return _context.Orders.ToList();
-        }
-
-        public void SaveOrder(Order order)
-        {
-            _context.Orders.Add(order);
+            var result = await _context.Orders.AddAsync(order);
+            await _context.SaveChangesAsync();
+            return result.Entity;
         }
 
         public void UpdateOrder(Order order)

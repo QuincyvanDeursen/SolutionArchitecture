@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using OrderService.Domain;
+using OrderService.DTO;
 using OrderService.Repository.Interface;
+using OrderService.Services;
+using OrderService.Services.Interface;
+using System.Security.Cryptography;
 
 namespace OrderService.Controllers
 {
@@ -8,21 +12,21 @@ namespace OrderService.Controllers
     [Route("api/[controller]")]
     public class OrderController : ControllerBase
     {
-
         private readonly ILogger<OrderController> _logger;
-        private readonly IOrderRepo _orderRepo; // Mogelijk moet dit de repo service worden ipv db.
+        private readonly IOrderService _orderService;
+        private readonly IOrderRepo _orderRepo;
 
-
-        public OrderController(ILogger<OrderController> logger, IOrderRepo orderRepo) { 
-        
-                _logger = logger;
+        public OrderController(ILogger<OrderController> logger, IOrderService orderService, IOrderRepo orderRepo)
+        { 
             _orderRepo = orderRepo;
+            _logger = logger;
+            _orderService = orderService;
         }
 
         [HttpGet]
-        public IEnumerable<Order> Get()
+        public async Task<IEnumerable<OrderDTO>> Get()
         {
-            return _orderRepo.GetOrders();
+            return await _orderRepo.GetAllOrdersAsync();
         }
 
         [HttpGet("{id}")]
@@ -39,9 +43,24 @@ namespace OrderService.Controllers
         }
 
         [HttpPost]
-        public void Post([FromBody] Order order)
+        public async Task<IActionResult> Post([FromBody] Order order)
         {
-            _orderRepo.SaveOrder(order);
+            try
+            {
+                if (await _orderService.CreateOrder(order))
+                {
+                    return Ok("Order saved successfully");
+                }
+                else
+                {
+                    return BadRequest("One or more products are not in stock");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing order");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         [HttpPut]
@@ -55,7 +74,5 @@ namespace OrderService.Controllers
         {
             _orderRepo.DeleteOrder(_orderRepo.GetOrder(id));
         }
-
-
     }
 }

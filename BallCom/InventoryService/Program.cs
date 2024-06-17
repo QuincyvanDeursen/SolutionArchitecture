@@ -7,6 +7,12 @@ using InventoryService.Domain;
 using InventoryService.EventHandlers;
 using InventoryService.EventHandlers.Interfaces;
 using InventoryService.Events;
+using InventoryService.Services.RabbitMQ;
+using RabbitMQ.Client;
+using Shared.MessageBroker.Consumer;
+using Shared.MessageBroker.Consumer.Interfaces;
+using Shared.MessageBroker.Publisher;
+using Shared.MessageBroker.Publisher.Interfaces;
 using Shared.Repository.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,9 +22,25 @@ var connectionString = builder.Configuration.GetConnectionString("Default");
 builder.Services.AddDbContext<InventoryDbContext>(
     options => options.UseSqlServer(connectionString));
 
+
+var exchangeName = builder.Configuration.GetSection("RabbitMQ:ExchangeName").Value;
+var queueName = builder.Configuration.GetSection("RabbitMQ:QueueName").Value;
+
 builder.Services.AddScoped<IReadRepository<Inventory>, InventoryRepo>();
 builder.Services.AddScoped<IWriteRepository<InventoryBaseEvent>, InventoryEventRepo>();
 builder.Services.AddScoped<IInventoryEventHandler, InventoryEventHandler>();
+builder.Services.AddScoped<IProductEventHandler, ProductEventHandler>();
+
+// Add RabbitMQ Publisher and Consumer services.
+builder.Services.AddSingleton<IConnectionFactory>(x => new ConnectionFactory
+{
+    Uri = new Uri(builder.Configuration.GetValue<string>("RabbitMQ:Uri") ?? "")
+});
+builder.Services.AddSingleton<IMessagePublisher>(x => new RabbitMqMessagePublisher(x.GetService<IConnectionFactory>(), exchangeName));
+builder.Services.AddSingleton<IMessageConsumer>(x => new RabbitMqMessageConsumer(x.GetService<IConnectionFactory>(), exchangeName, queueName));
+
+// Add hosted service for listening to RabbitMQ messages.
+builder.Services.AddHostedService<InventoryMessageListenerService>();
 
 builder.Services.AddControllers();
 

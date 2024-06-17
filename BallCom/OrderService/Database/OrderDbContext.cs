@@ -14,9 +14,9 @@ namespace OrderService.Database
         {
             IEnumerable<Order> orders = new List<Order>
             {
-                new Order { Id = 1, OrderDate = DateTime.Now, CustomerId = 1, ProductId = 1, PaymentId = 1 },
-                new Order { Id = 2, OrderDate = DateTime.Now, CustomerId = 2, ProductId = 2, PaymentId = 2 },
-                new Order { Id = 3, OrderDate = DateTime.Now, CustomerId = 3, ProductId = 3, PaymentId = 3 },
+                new Order { Id = 1, OrderDate = DateTime.Now, CustomerId = 1, PaymentId = 1, Adress = "Pelmolenstraat 11A", Postalcode = "4811LR", City = "Breda" },
+                new Order { Id = 2, OrderDate = DateTime.Now, CustomerId = 2, PaymentId = 2, Adress = "Pelmolenstraat 101A", Postalcode = "4812LR", City = "Breda" },
+                new Order { Id = 3, OrderDate = DateTime.Now, CustomerId = 3, PaymentId = 3, Adress = "Pelmolenstraat 111A", Postalcode = "4813LR", City = "Breda" },
             };
 
             IEnumerable<OrderItem> orderItems = new List<OrderItem>
@@ -32,12 +32,6 @@ namespace OrderService.Database
 
             modelBuilder.Entity<OrderItem>().HasKey(oi => oi.Id);
             modelBuilder.Entity<OrderItem>().HasData(orderItems);
-
-            modelBuilder.Entity<Order>()
-                .HasMany<OrderItem>(o => o.OrderItems)
-                .WithOne(oi => oi.Order)
-                .HasForeignKey(oi => oi.OrderId);
-
         }
 
     }

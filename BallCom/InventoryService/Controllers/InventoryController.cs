@@ -2,6 +2,7 @@ using InventoryService.Domain;
 using InventoryService.EventHandlers.Interfaces;
 using InventoryService.Events;
 using Microsoft.AspNetCore.Mvc;
+using Shared.MessageBroker.Publisher.Interfaces;
 using Shared.Repository.Interface;
 
 namespace InventoryService.Endpoints
@@ -11,13 +12,15 @@ namespace InventoryService.Endpoints
         private readonly ILogger<InventoryController> _logger;
         private readonly IReadRepository<Inventory> _inventoryRepository;
         private readonly IInventoryEventHandler _eventHandler;
+        private readonly IMessagePublisher _messagePublisher;
 
         public InventoryController(ILogger<InventoryController> logger, IReadRepository<Inventory> inventoryRepository,
-            IInventoryEventHandler eventHandler)
+            IInventoryEventHandler eventHandler, IMessagePublisher messagePublisher)
         {
             _logger = logger;
             _inventoryRepository = inventoryRepository;
             _eventHandler = eventHandler;
+            _messagePublisher = messagePublisher;
         }
 
         [HttpGet]
@@ -55,6 +58,15 @@ namespace InventoryService.Endpoints
 
             // Remove the inventory from the inventory table
             _inventoryRepository.RemoveAsync(inventory);
+        }
+        
+        
+        // TODO: Remove this test endpoint (Testing rabbitMQ message publish wrapper)
+        [HttpGet("Test")]
+        public async Task Test()
+        {
+            // Sending a message to the inventory.test topic (self listening)
+            await _messagePublisher.PublishAsync(new { Message = "Hello World" }, "inventory.test");
         }
     }
 }

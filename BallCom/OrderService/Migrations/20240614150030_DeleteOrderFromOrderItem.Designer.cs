@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OrderService.Database;
 
@@ -11,9 +12,11 @@ using OrderService.Database;
 namespace OrderService.Migrations
 {
     [DbContext(typeof(OrderDbContext))]
-    partial class OrderDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240614150030_DeleteOrderFromOrderItem")]
+    partial class DeleteOrderFromOrderItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,12 +33,6 @@ namespace OrderService.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Adress")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("City")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
@@ -45,9 +42,6 @@ namespace OrderService.Migrations
                     b.Property<int?>("PaymentId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Postalcode")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.ToTable("Orders");
@@ -56,32 +50,23 @@ namespace OrderService.Migrations
                         new
                         {
                             Id = 1,
-                            Adress = "Pelmolenstraat 11A",
-                            City = "Breda",
                             CustomerId = 1,
-                            OrderDate = new DateTime(2024, 6, 17, 11, 0, 43, 991, DateTimeKind.Local).AddTicks(167),
-                            PaymentId = 1,
-                            Postalcode = "4811LR"
+                            OrderDate = new DateTime(2024, 6, 14, 17, 0, 29, 869, DateTimeKind.Local).AddTicks(5641),
+                            PaymentId = 1
                         },
                         new
                         {
                             Id = 2,
-                            Adress = "Pelmolenstraat 101A",
-                            City = "Breda",
                             CustomerId = 2,
-                            OrderDate = new DateTime(2024, 6, 17, 11, 0, 43, 991, DateTimeKind.Local).AddTicks(212),
-                            PaymentId = 2,
-                            Postalcode = "4812LR"
+                            OrderDate = new DateTime(2024, 6, 14, 17, 0, 29, 869, DateTimeKind.Local).AddTicks(5683),
+                            PaymentId = 2
                         },
                         new
                         {
                             Id = 3,
-                            Adress = "Pelmolenstraat 111A",
-                            City = "Breda",
                             CustomerId = 3,
-                            OrderDate = new DateTime(2024, 6, 17, 11, 0, 43, 991, DateTimeKind.Local).AddTicks(215),
-                            PaymentId = 3,
-                            Postalcode = "4813LR"
+                            OrderDate = new DateTime(2024, 6, 14, 17, 0, 29, 869, DateTimeKind.Local).AddTicks(5685),
+                            PaymentId = 3
                         });
                 });
 

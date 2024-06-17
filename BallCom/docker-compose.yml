@@ -1,0 +1,42 @@
+﻿name: ballcom
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: "rabbitmq"
+    ports:
+      - 5672:5672
+      - 15672:15672
+    restart: unless-stopped
+  
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      - SA_PASSWORD=63km6xou9Z8GeZ
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"
+    restart: unless-stopped
+  
+  customerservice:
+    build:
+      context: .
+      dockerfile: CustomerService.Dockerfile
+    container_name: customer_service
+    depends_on:
+      - rabbitmq
+      - sqlserver
+    ports:
+      - "3001:3001"
+        
+  orderservice:
+    build:
+      context: .
+      dockerfile: OrderService.Dockerfile
+    container_name: order_service
+    depends_on:
+      - rabbitmq
+      - sqlserver
+    ports:
+      - "3003:3003"

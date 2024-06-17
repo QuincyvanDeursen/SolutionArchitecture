@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OrderService.Domain;
 using OrderService.Repository.Interface;
+using OrderService.Services.Interface;
 
 namespace OrderService.Controllers
 {
@@ -10,6 +11,7 @@ namespace OrderService.Controllers
     {
         private readonly ILogger<OrderItemController> _logger;
         private readonly IOrderItemRepo _orderItemRepo;
+
 
         public OrderItemController(ILogger<OrderItemController> logger, IOrderItemRepo orderItemRepo)
         {
