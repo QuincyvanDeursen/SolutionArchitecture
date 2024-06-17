@@ -32,12 +32,6 @@ namespace OrderService.Database
 
             modelBuilder.Entity<OrderItem>().HasKey(oi => oi.Id);
             modelBuilder.Entity<OrderItem>().HasData(orderItems);
-
-            modelBuilder.Entity<Order>()
-                .HasMany<OrderItem>(o => o.OrderItems)
-                .WithOne(oi => oi.Order)
-                .HasForeignKey(oi => oi.OrderId);
-
         }
 
     }

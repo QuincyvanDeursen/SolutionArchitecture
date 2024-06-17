@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OrderService.Database;
 
@@ -11,9 +12,11 @@ using OrderService.Database;
 namespace OrderService.Migrations
 {
     [DbContext(typeof(OrderDbContext))]
-    partial class OrderDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240614145520_orderMigration")]
+    partial class orderMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,21 +51,21 @@ namespace OrderService.Migrations
                         {
                             Id = 1,
                             CustomerId = 1,
-                            OrderDate = new DateTime(2024, 6, 14, 17, 6, 1, 722, DateTimeKind.Local).AddTicks(5441),
+                            OrderDate = new DateTime(2024, 6, 14, 16, 55, 20, 385, DateTimeKind.Local).AddTicks(2954),
                             PaymentId = 1
                         },
                         new
                         {
                             Id = 2,
                             CustomerId = 2,
-                            OrderDate = new DateTime(2024, 6, 14, 17, 6, 1, 722, DateTimeKind.Local).AddTicks(5484),
+                            OrderDate = new DateTime(2024, 6, 14, 16, 55, 20, 385, DateTimeKind.Local).AddTicks(2999),
                             PaymentId = 2
                         },
                         new
                         {
                             Id = 3,
                             CustomerId = 3,
-                            OrderDate = new DateTime(2024, 6, 14, 17, 6, 1, 722, DateTimeKind.Local).AddTicks(5487),
+                            OrderDate = new DateTime(2024, 6, 14, 16, 55, 20, 385, DateTimeKind.Local).AddTicks(3001),
                             PaymentId = 3
                         });
                 });
