@@ -4,6 +4,12 @@ using System.Reflection;
 using CustomerService.Database;
 using CustomerService.Repository;
 using CustomerService.Repository.Interfaces;
+using CustomerService.Services.RabbitMQ;
+using Shared.MessageBroker;
+using Shared.MessageBroker.Consumer;
+using Shared.MessageBroker.Consumer.Interfaces;
+using Shared.MessageBroker.Publisher;
+using Shared.MessageBroker.Publisher.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +19,17 @@ builder.Services.AddDbContext<CustomerDbContext>(
 
 // Add services to the container.
 builder.Services.AddScoped<ICustomerRepo, CustomerEFRepo>();
+
+// Add RabbitMQ Publisher and Consumer services.
+var exchangeName = builder.Configuration.GetValue<string>("RabbitMQ:ExchangeName");
+var queueName = builder.Configuration.GetValue<string>("RabbitMQ:QueueName");
+
+builder.Services.AddSingleton<IConnectionProvider>(x => new RabbitMqConnectionProvider(builder.Configuration.GetValue<string>("RabbitMQ:Uri") ?? ""));
+builder.Services.AddSingleton<IMessagePublisher>(x => new RabbitMqMessagePublisher(x.GetService<IConnectionProvider>(), exchangeName));
+builder.Services.AddSingleton<IMessageConsumer>(x => new RabbitMqMessageConsumer(x.GetService<IConnectionProvider>(), exchangeName, queueName));
+
+// Add a hosted service for listening to RabbitMQ messages (consumer).
+builder.Services.AddHostedService<CustomerMessageListenerService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
