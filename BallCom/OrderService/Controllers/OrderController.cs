@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using OrderService.Domain;
 using OrderService.DTO;
 using OrderService.Repository.Interface;
@@ -12,7 +12,6 @@ namespace OrderService.Controllers
     [Route("api/[controller]")]
     public class OrderController : ControllerBase
     {
-
         private readonly ILogger<OrderController> _logger;
         private readonly IOrderService _orderService;
         private readonly IOrderRepo _orderRepo;
