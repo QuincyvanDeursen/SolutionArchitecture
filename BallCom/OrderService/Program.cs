@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using OrderService.Database;
 using OrderService.Repository;
 using OrderService.Repository.Interface;
+using OrderService.Services;
+using OrderService.Services.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,8 @@ builder.Services.AddDbContext<OrderDbContext>(
     options => options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IOrderRepo, OrderRepo>();
 builder.Services.AddScoped<IOrderItemRepo, OrderItemRepo>();
+builder.Services.AddScoped<IOrderService, OrderService.Services.OrderService>();
+builder.Services.AddScoped<IInventoryServiceClient, InventoryServiceClient>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

@@ -1,6 +1,9 @@
-﻿namespace OrderService.Services.Interface
+﻿using OrderService.Domain;
+
+namespace OrderService.Services.Interface
 {
-    public class IOrderService
+    public interface IOrderService
     {
+        Task<bool> CreateOrder(Order order);
     }
 }
