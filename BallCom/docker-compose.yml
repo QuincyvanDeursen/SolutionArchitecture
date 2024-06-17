@@ -2,7 +2,7 @@
 
 services:
   rabbitmq:
-    image: rabbitmq:3-management-alpine
+    image: rabbitmq:3-management
     container_name: "rabbitmq"
     ports:
       - 5672:5672
@@ -23,9 +23,20 @@ services:
     build:
       context: .
       dockerfile: CustomerService.Dockerfile
-    container_name: customerservice
+    container_name: customer_service
     depends_on:
       - rabbitmq
       - sqlserver
     ports:
       - "3001:3001"
+        
+  orderservice:
+    build:
+      context: .
+      dockerfile: OrderService.Dockerfile
+    container_name: order_service
+    depends_on:
+      - rabbitmq
+      - sqlserver
+    ports:
+      - "3003:3003"
