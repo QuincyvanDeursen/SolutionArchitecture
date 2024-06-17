@@ -20,7 +20,6 @@
   <ItemGroup>
     <Folder Include="Migrations\" />
     <Folder Include="Repository\Interface\" />
-    <Folder Include="Services\Interface\" />
   </ItemGroup>
 
   <ItemGroup>

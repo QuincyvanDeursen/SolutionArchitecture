@@ -29,7 +29,30 @@ services:
       - sqlserver
     ports:
       - "3001:3001"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
         
+  inventoryservice:
+    build:
+      context: .
+      dockerfile: InventoryService.Dockerfile
+    container_name: inventory_service
+    depends_on:
+      - rabbitmq
+      - sqlserver
+    ports:
+      - "3002:3002"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s      
+  
   orderservice:
     build:
       context: .
@@ -40,3 +63,26 @@ services:
       - sqlserver
     ports:
       - "3003:3003"
+    deploy:
+      restart_policy: 
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+        
+  paymentservice:
+    build:
+      context: .
+      dockerfile: PaymentService.Dockerfile
+    container_name: payment_service
+    depends_on:
+      - rabbitmq
+      - sqlserver
+    ports:
+      - "3004:3004"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
