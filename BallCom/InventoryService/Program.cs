@@ -29,6 +29,7 @@ var queueName = builder.Configuration.GetSection("RabbitMQ:QueueName").Value;
 builder.Services.AddScoped<IReadRepository<Inventory>, InventoryRepo>();
 builder.Services.AddScoped<IWriteRepository<InventoryBaseEvent>, InventoryEventRepo>();
 builder.Services.AddScoped<IInventoryEventHandler, InventoryEventHandler>();
+builder.Services.AddScoped<IProductEventHandler, ProductEventHandler>();
 
 // Add RabbitMQ Publisher and Consumer services.
 builder.Services.AddSingleton<IConnectionFactory>(x => new ConnectionFactory

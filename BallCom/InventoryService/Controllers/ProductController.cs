@@ -1,5 +1,6 @@
 ﻿using InventoryService.Domain;
 using InventoryService.Endpoints;
+using InventoryService.EventHandlers;
 using InventoryService.EventHandlers.Interfaces;
 using InventoryService.Events;
 using Microsoft.AspNetCore.Mvc;
@@ -11,11 +12,13 @@ namespace InventoryService.Controllers
     {
         private readonly ILogger<ProductController> _logger;
         private readonly IReadRepository<Product> _productRepository;
+        private readonly IProductEventHandler _productEventHandler;
 
-        public ProductController(ILogger<ProductController> logger, IReadRepository<Product> productRepository)
+        public ProductController(ILogger<ProductController> logger, IReadRepository<Product> productRepository, IProductEventHandler productEventHandler)
         {
             _logger = logger;
             _productRepository = productRepository;
+            _productEventHandler = productEventHandler;
         }
 
         [HttpGet]
@@ -35,6 +38,7 @@ namespace InventoryService.Controllers
         {
             // Save the inventory to the inventory table
             _productRepository.CreateAsync(product);
+            _productEventHandler.Handle(product);
         }
 
         [HttpDelete]

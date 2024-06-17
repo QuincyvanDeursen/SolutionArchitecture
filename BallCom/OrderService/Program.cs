@@ -9,6 +9,8 @@ using Shared.MessageBroker.Consumer;
 using Shared.MessageBroker.Consumer.Interfaces;
 using Shared.MessageBroker.Publisher;
 using Shared.MessageBroker.Publisher.Interfaces;
+using OrderService.Services;
+using OrderService.Services.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +32,8 @@ builder.Services.AddSingleton<IMessageConsumer>(x => new RabbitMqMessageConsumer
 // Add a hosted service for listening to RabbitMQ messages (consumer).
 builder.Services.AddHostedService<OrderMessageListenerService>();
 
+builder.Services.AddScoped<IOrderService, OrderService.Services.OrderService>();
+builder.Services.AddScoped<IInventoryServiceClient, InventoryServiceClient>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
