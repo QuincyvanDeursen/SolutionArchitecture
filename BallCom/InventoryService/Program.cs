@@ -7,6 +7,7 @@ using InventoryService.Domain;
 using InventoryService.EventHandlers;
 using InventoryService.EventHandlers.Interfaces;
 using InventoryService.Events;
+using InventoryService.Services.Interfaces;
 using InventoryService.Services.RabbitMQ;
 using RabbitMQ.Client;
 using Shared.MessageBroker.Consumer;
@@ -29,6 +30,7 @@ var queueName = builder.Configuration.GetSection("RabbitMQ:QueueName").Value;
 builder.Services.AddScoped<IWriteRepository<InventoryBaseEvent>, InventoryWriteRepo>();
 builder.Services.AddScoped<IReadRepository<Product>, InventoryReadRepo>();
 builder.Services.AddScoped<IInventoryEventHandler, InventoryEventHandler>();
+builder.Services.AddScoped<IInventoryService, InventoryService.Services.InventoryService>();
 
 // Add RabbitMQ Publisher and Consumer services.
 builder.Services.AddSingleton<IConnectionFactory>(x => new ConnectionFactory

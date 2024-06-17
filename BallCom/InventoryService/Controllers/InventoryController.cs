@@ -2,6 +2,7 @@
 using InventoryService.Dto;
 using InventoryService.EventHandlers.Interfaces;
 using InventoryService.Events;
+using InventoryService.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Shared.MessageBroker.Publisher.Interfaces;
@@ -14,89 +15,84 @@ namespace InventoryService.Controllers
     public class InventoryController : ControllerBase
     {
         private readonly ILogger<InventoryController> _logger;
-        private readonly IReadRepository<Product> _productReadRepo;
-        private readonly IInventoryEventHandler _inventoryEventHandler;
+        private readonly IInventoryService _inventoryService;
+
         //private readonly IMessagePublisher _messagePublisher;
 
 
-        public InventoryController(ILogger<InventoryController> logger, IReadRepository<Product> productReadRepo, IInventoryEventHandler inventoryEventHandler /*IMessagePublisher messagePublisher*/)
+        public InventoryController(ILogger<InventoryController> logger, IInventoryService inventoryService /*IMessagePublisher messagePublisher*/)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _productReadRepo = productReadRepo ?? throw new ArgumentNullException(nameof(productReadRepo));
-            _inventoryEventHandler = inventoryEventHandler ?? throw new ArgumentNullException(nameof(inventoryEventHandler));
+            _inventoryService = inventoryService;
             //_messagePublisher = messagePublisher ?? throw new ArgumentNullException(nameof(messagePublisher));
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> Get()
         {
-            var products = await _productReadRepo.GetAllAsync();
-            if (products == null || !products.Any())
+            try
             {
-                return NotFound();
+                _logger.LogInformation("Getting all products");
+
+                var products = await _inventoryService.GetAllProducts();
+
+                return Ok(products);
             }
-            return Ok(products);
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> Get(Guid id)
         {
-            var result = await _productReadRepo.GetByIdAsync(id);
-            if (result == null)
+            try
             {
-                return NotFound();
+                _logger.LogInformation($"Getting product with id: {id}");
+
+                var result = await _inventoryService.GetProduct(id);
+
+                return Ok(result);
             }
-            return Ok(result);
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] ProductCreateDto productCreateDto)
         {
-            var product = new Product
+            try
             {
-                Id = Guid.NewGuid(),
-                Name = productCreateDto.Name,
-                Quantity = productCreateDto.Quantity,
-                Price = productCreateDto.Price,
-                Description = productCreateDto.Description
-            };
+                _logger.LogInformation("Adding new product");
 
-            var productJson = JsonConvert.SerializeObject(product);
-            var inventoryEvent = new InventoryCreatedEvent(productJson);
+                await _inventoryService.AddProduct(productCreateDto);
 
-            // Save the event to seperate table in the database
-            await _inventoryEventHandler.Handle(inventoryEvent);
-
-            return Ok();
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult> Update([FromBody] ProductUpdateDto productUpdateDto, Guid id)
         {
-            var oldProduct = await _productReadRepo.GetByIdAsync(id);
-            if (oldProduct == null)
+            try
             {
-                return NotFound();
+                _logger.LogInformation($"Updating product with id: {id}");
+
+                await _inventoryService.UpdateProduct(id, productUpdateDto);
+
+                return Ok();
             }
-
-            var product = new Product 
-                {
-                Id = id,
-                Name = productUpdateDto.Name ?? oldProduct.Name,
-                Quantity = productUpdateDto.Quantity,
-                Price = productUpdateDto.Price ?? oldProduct.Price,
-                Description = productUpdateDto.Description ?? oldProduct.Description
-            };
-
-
-            var productJson = JsonConvert.SerializeObject(product);
-
-            var inventoryEvent = new InventoryUpdateEvent(productJson);
-
-            // Save the event to seperate table in the database
-            await _inventoryEventHandler.Handle(inventoryEvent);
-
-            return Ok(); 
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         //[HttpGet("Test")]
