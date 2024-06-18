@@ -83,5 +83,7 @@ namespace InventoryService.Services
             // Save the event to seperate table in the database
             await _inventoryEventHandler.Handle(inventoryEvent);
         }
+
+
     }
 }
