@@ -1,14 +1,13 @@
 using Polly;
-using Polly.Retry;
 using RabbitMQ.Client;
 
-namespace Shared.MessageBroker;
+namespace Shared.MessageBroker.Connection;
 
 public class RabbitMqConnectionProvider(string uri) : IConnectionProvider
 {
     private IConnection _connection ;
     
-    private IConnectionFactory _connectionFactory = new ConnectionFactory()
+    private readonly ConnectionFactory _connectionFactory = new()
     {
         Uri = new Uri(uri)
     };

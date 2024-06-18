@@ -1,6 +1,7 @@
 using System.Text;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
+using Shared.MessageBroker.Connection;
 using Shared.MessageBroker.Publisher.Interfaces;
 
 namespace Shared.MessageBroker.Publisher;
