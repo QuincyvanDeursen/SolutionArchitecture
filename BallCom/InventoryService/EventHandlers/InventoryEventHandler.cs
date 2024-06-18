@@ -1,7 +1,9 @@
-﻿using InventoryService.EventHandlers.Interfaces;
+﻿using InventoryService.Domain;
+using InventoryService.EventHandlers.Interfaces;
 using InventoryService.Events;
 using Shared.MessageBroker.Publisher.Interfaces;
 using Shared.Repository.Interface;
+using System.Text.Json;
 
 namespace InventoryService.EventHandlers
 {
@@ -19,13 +21,13 @@ namespace InventoryService.EventHandlers
         public async Task Handle(InventoryCreatedEvent @event)
         {
             await _inventoryWriteRepo.Save(@event);
-            await _messagePublisher.PublishAsync(new { Message = @event.Product }, "inventory.create");
+            await _messagePublisher.PublishAsync(JsonSerializer.Deserialize<Product>(@event.Product), "inventory.create");
         }
 
         public async  Task Handle(InventoryUpdateEvent @event)
         {
             await _inventoryWriteRepo.Save(@event);
-            await _messagePublisher.PublishAsync(new { Message = @event.Product }, "inventory.update");
+            await _messagePublisher.PublishAsync(JsonSerializer.Deserialize<Product>(@event.Product), "inventory.update");
         }
     }
 }

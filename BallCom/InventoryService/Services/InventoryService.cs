@@ -41,7 +41,7 @@ namespace InventoryService.Services
             return result;
         }
 
-        public async Task AddProduct(ProductCreateDto productCreateDto)
+        public async Task AddProductToWriteDB(ProductCreateDto productCreateDto)
         {
             var product = new Product
             {
@@ -59,7 +59,7 @@ namespace InventoryService.Services
             await _inventoryEventHandler.Handle(inventoryEvent);
         }
 
-        public async Task UpdateProduct(Guid id, ProductUpdateDto productUpdateDto)
+        public async Task UpdateProductToWriteDB(Guid id, ProductUpdateDto productUpdateDto)
         {
             var oldProduct = await _productReadRepo.GetByIdAsync(id);
             if (oldProduct == null)
@@ -77,13 +77,33 @@ namespace InventoryService.Services
             };
 
             var productJson = JsonConvert.SerializeObject(product);
-
             var inventoryEvent = new InventoryUpdateEvent(productJson);
 
             // Save the event to seperate table in the database
             await _inventoryEventHandler.Handle(inventoryEvent);
         }
 
+        public async Task UpdateProductToReadDB(Guid id, Product product)
+        {
+            var oldProduct = await GetProduct(id);
 
+            var quantity = oldProduct.Quantity + product.Quantity;
+
+            if (quantity < 0) { 
+                //TODO: cancel een update inventory en plaats bericht op bus met juiste label
+            }
+
+            var newProduct = new Product
+            {
+                Quantity = quantity
+            };
+
+            await _productReadRepo.UpdateAsync(id, newProduct);
+        }
+
+        public async Task AddProductToReadDB(Product product)
+        {
+            await _productReadRepo.CreateAsync(product);
+        }
     }
 }

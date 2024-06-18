@@ -1,12 +1,7 @@
 ﻿using InventoryService.Domain;
 using InventoryService.Dto;
-using InventoryService.EventHandlers.Interfaces;
-using InventoryService.Events;
 using InventoryService.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Shared.MessageBroker.Publisher.Interfaces;
-using Shared.Repository.Interface;
 
 namespace InventoryService.Controllers
 {
@@ -17,14 +12,10 @@ namespace InventoryService.Controllers
         private readonly ILogger<InventoryController> _logger;
         private readonly IInventoryService _inventoryService;
 
-        //private readonly IMessagePublisher _messagePublisher;
-
-
-        public InventoryController(ILogger<InventoryController> logger, IInventoryService inventoryService /*IMessagePublisher messagePublisher*/)
+        public InventoryController(ILogger<InventoryController> logger, IInventoryService inventoryService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _inventoryService = inventoryService;
-            //_messagePublisher = messagePublisher ?? throw new ArgumentNullException(nameof(messagePublisher));
         }
 
         [HttpGet]
@@ -68,7 +59,7 @@ namespace InventoryService.Controllers
             {
                 _logger.LogInformation("Adding new product");
 
-                await _inventoryService.AddProduct(productCreateDto);
+                await _inventoryService.AddProductToWriteDB(productCreateDto);
 
                 return Ok();
             }
@@ -85,7 +76,7 @@ namespace InventoryService.Controllers
             {
                 _logger.LogInformation($"Updating product with id: {id}");
 
-                await _inventoryService.UpdateProduct(id, productUpdateDto);
+                await _inventoryService.UpdateProductToWriteDB(id, productUpdateDto);
 
                 return Ok();
             }

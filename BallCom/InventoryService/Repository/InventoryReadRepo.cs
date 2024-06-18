@@ -36,5 +36,19 @@ namespace InventoryService.Repository
             context.Products.Remove(entity);
             await context.SaveChangesAsync();
         }
+
+        public async Task UpdateAsync(Guid id, Product product)
+        {
+            var existingProduct = await GetByIdAsync(id);
+
+            if (existingProduct == null)
+            {
+                throw new KeyNotFoundException($"Product with ID {id} not found.");
+            }
+
+            existingProduct.Quantity = product.Quantity;
+
+            await context.SaveChangesAsync();
+        }
     }
 }
