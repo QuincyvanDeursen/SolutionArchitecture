@@ -11,6 +11,7 @@ using Shared.MessageBroker.Consumer;
 using Shared.MessageBroker.Consumer.Interfaces;
 using Shared.MessageBroker.Publisher;
 using Shared.MessageBroker.Publisher.Interfaces;
+using CustomerService.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +20,8 @@ builder.Services.AddDbContext<CustomerDbContext>(
     options => options.UseSqlServer(connectionString));
 
 // Add services to the container.
-builder.Services.AddScoped<ICustomerRepo, CustomerEFRepo>();
+builder.Services.AddScoped<ICustomerRepo, CustomerRepo>();
+builder.Services.AddScoped<ICustomerService, CustomerService.Services.CustomerService>();
 
 // Add RabbitMQ Publisher and Consumer services.
 var exchangeName = builder.Configuration.GetValue<string>("RabbitMQ:ExchangeName");
