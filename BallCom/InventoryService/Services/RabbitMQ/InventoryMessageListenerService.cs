@@ -13,12 +13,26 @@ public class InventoryMessageListenerService(IMessageConsumer messageConsumer) :
     {
         await messageConsumer.ConsumeAsync<MessageEventData<object>>(OnMessageReceived, new []
         {
-            "inventory.*"
+            "inventory.create",
+            "inventory.update"
         });
     }
 
     public async Task OnMessageReceived(MessageEventData<object> data)
     {
+        switch (data.Topic)
+        {
+            case "inventory.create":
+                Console.WriteLine();
+                break;
+            case "inventory.update":
+                Console.WriteLine();
+                break;
+            default:
+                Console.WriteLine();
+                throw new ArgumentException(data.Topic + " is not a listed topic.");
+        }
+            
         // TODO: Based on the topic, do the appropriate action
         Console.WriteLine($"[{data.Timestamp}] Received message: ({data.Topic} - {data.Id})");
     }

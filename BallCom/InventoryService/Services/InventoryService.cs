@@ -76,16 +76,12 @@ namespace InventoryService.Services
                 Description = productUpdateDto.Description ?? oldProduct.Description
             };
 
-
             var productJson = JsonConvert.SerializeObject(product);
 
             var inventoryEvent = new InventoryUpdateEvent(productJson);
 
             // Save the event to seperate table in the database
             await _inventoryEventHandler.Handle(inventoryEvent);
-
-            // Update the product in the read table
-
         }
     }
 }

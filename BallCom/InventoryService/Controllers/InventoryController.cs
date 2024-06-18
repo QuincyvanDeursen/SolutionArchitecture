@@ -94,12 +94,5 @@ namespace InventoryService.Controllers
                 return BadRequest(e.Message);
             }
         }
-
-        //[HttpGet("Test")]
-        //public async Task Test()
-        //{
-        //    // Sending a message to the inventory.test topic (self listening)
-        //    await _messagePublisher.PublishAsync(new { Message = "Hello World" }, "inventory.test");
-        //}
     }
 }
