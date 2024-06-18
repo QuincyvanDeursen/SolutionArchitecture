@@ -27,6 +27,10 @@ public class InventoryMessageListenerService(IMessageConsumer messageConsumer) :
                 break;
             case "inventory.update":
                 Console.WriteLine();
+                // Huidige inventory ophalen
+                // Huidige inventory >= event.inventory
+                // Zo ja, write db update
+                // Zo nee, Error, inventory niet goed
                 break;
             default:
                 Console.WriteLine();
@@ -42,4 +46,6 @@ public class InventoryMessageListenerService(IMessageConsumer messageConsumer) :
         // TODO: Implement the stop logic for the connection
         return Task.CompletedTask;
     }
+
+
 }

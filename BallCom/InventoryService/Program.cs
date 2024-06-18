@@ -40,7 +40,7 @@ builder.Services.AddSingleton<IMessageConsumer>(x => new RabbitMqMessageConsumer
 
 
 // Add hosted service for listening to RabbitMQ messages.
-//builder.Services.AddHostedService<InventoryMessageListenerService>();
+builder.Services.AddHostedService<InventoryMessageListenerService>();
 
 builder.Services.AddControllers();
 
@@ -75,9 +75,9 @@ builder.Services.AddSwaggerGen(
 if (builder.Environment.IsProduction())
 {
     // TODO: Re-activate migrations when it is fixed
-    // using var scope = builder.Services.BuildServiceProvider().CreateScope();
-    // var dbContext = scope.ServiceProvider.GetRequiredService<InventoryDbContext>();
-    // dbContext.Database.Migrate();
+    using var scope = builder.Services.BuildServiceProvider().CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<InventoryDbContext>();
+    dbContext.Database.Migrate();
 }
 
 var app = builder.Build();
