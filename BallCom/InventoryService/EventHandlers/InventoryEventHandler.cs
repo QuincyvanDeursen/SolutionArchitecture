@@ -20,14 +20,14 @@ namespace InventoryService.EventHandlers
 
         public async Task Handle(InventoryCreatedEvent @event)
         {
-            await _inventoryWriteRepo.Save(@event);
-            await _messagePublisher.PublishAsync(JsonSerializer.Deserialize<Product>(@event.Product), "inventory.create");
+            await _inventoryWriteRepo.CreateAsync(@event);
+            await _messagePublisher.PublishAsync(@event.Product, "inventory.create");
         }
 
-        public async  Task Handle(InventoryUpdateEvent @event)
+        public async Task Handle(InventoryUpdateEvent @event)
         {
-            await _inventoryWriteRepo.Save(@event);
-            await _messagePublisher.PublishAsync(JsonSerializer.Deserialize<Product>(@event.Product), "inventory.update");
+            await _inventoryWriteRepo.CreateAsync(@event);
+            await _messagePublisher.PublishAsync(@event.Product, "inventory.update");
         }
     }
 }

@@ -26,6 +26,7 @@ namespace InventoryService.Database
             modelBuilder.Entity<Product>().HasKey(p => p.Id);
             modelBuilder.Entity<Product>().HasData(products);
 
+            modelBuilder.Entity<InventoryBaseEvent>().Ignore(p => p.Product);
 
             modelBuilder.Entity<InventoryBaseEvent>().HasKey(ie => ie.Id);
             modelBuilder.Entity<InventoryBaseEvent>()
