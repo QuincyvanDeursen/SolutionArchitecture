@@ -6,10 +6,9 @@ namespace InventoryService.Events
 {
     public class InventoryCreatedEvent : InventoryBaseEvent
     {
-        public InventoryCreatedEvent(int productId, int quantity)
+        public InventoryCreatedEvent(string product)
         {
-            ProductId = productId;
-            Quantity = quantity;
+            Product = product;
         }
         public override void Accept(IInventoryEventHandler @event)
         {

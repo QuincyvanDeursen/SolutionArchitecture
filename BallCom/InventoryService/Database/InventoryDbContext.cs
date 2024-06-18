@@ -6,8 +6,7 @@ namespace InventoryService.Database
 {
     public class InventoryDbContext : DbContext
     {
-        public DbSet<Product>? Products { get; set; }
-        public DbSet<Inventory> Inventories { get; set; }
+        public DbSet<Product> Products { get; set; }
         public DbSet<InventoryBaseEvent> InventoryEvents { get; set; }
 
 
@@ -19,30 +18,20 @@ namespace InventoryService.Database
         {
             IEnumerable<Product> products = new List<Product>
             {
-                new Product { Id = 1, Name = "Laptop", Description = "HP Envy 16x", Price = 799.0m },
-                new Product { Id = 2, Name = "Mouse", Description = "Logitech MX Master", Price = 40.0m },
-                new Product { Id = 3, Name = "Keyboard", Description = "Coolermaster CK550", Price = 80.0m }
+                new Product { Id = Guid.NewGuid(), Name = "Laptop", Description = "HP Envy 16x", Price = 799.0m, Quantity = 10 },
+                new Product { Id = Guid.NewGuid(), Name = "Mouse", Description = "Logitech MX Master", Price = 40.0m, Quantity = 0},
+                new Product { Id = Guid.NewGuid(), Name = "Keyboard", Description = "Coolermaster CK550", Price = 80.0m, Quantity = 1}
             };
 
             modelBuilder.Entity<Product>().HasKey(p => p.Id);
             modelBuilder.Entity<Product>().HasData(products);
 
-            IEnumerable<Inventory> inventories = new List<Inventory>
-            {
-                new Inventory { Id = 1, ProductId = 1, Quantity = 10 },
-                new Inventory { Id = 2, ProductId = 2, Quantity = 20 },
-                new Inventory { Id = 3, ProductId = 3, Quantity = 30 }
-            };
-
-            modelBuilder.Entity<Inventory>().HasKey(i => i.Id);
-            modelBuilder.Entity<Inventory>().HasData(inventories);
 
             modelBuilder.Entity<InventoryBaseEvent>().HasKey(ie => ie.Id);
-
-            modelBuilder.Entity<Inventory>()
-                .HasOne<Product>()
-                .WithOne()
-                .HasForeignKey<Inventory>(i => i.ProductId);
+            modelBuilder.Entity<InventoryBaseEvent>()
+                .HasDiscriminator<string>("EventType")
+                .HasValue<InventoryCreatedEvent>("InventoryCreate")
+                .HasValue<InventoryUpdateEvent>("InventoryUpdate");
         }
     }
 }
