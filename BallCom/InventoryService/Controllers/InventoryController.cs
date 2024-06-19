@@ -59,7 +59,7 @@ namespace InventoryService.Controllers
             {
                 _logger.LogInformation("Adding new product");
 
-                await _inventoryService.AddProductToWriteDB(productCreateDto);
+                await _inventoryService.CreateEvent(productCreateDto);
 
                 return Ok();
             }
@@ -76,7 +76,7 @@ namespace InventoryService.Controllers
             {
                 _logger.LogInformation($"Updating product with id: {id}");
 
-                await _inventoryService.UpdateProductToWriteDB(id, productUpdateDto);
+                await _inventoryService.CreateUpdateEvent(id, productUpdateDto);
 
                 return Ok();
             }

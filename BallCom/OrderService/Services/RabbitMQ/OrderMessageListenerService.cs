@@ -9,14 +9,14 @@ public class OrderMessageListenerService(IMessageConsumer messageConsumer) : IHo
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        await messageConsumer.ConsumeAsync<MessageEventData<object>>(OnMessageReceived, new []
+        await messageConsumer.ConsumeAsync(OnMessageReceived, new []
         {
             "order.*",
             "inventory.*", // TODO: remove this line (testing)
         });
     }
 
-    public async Task OnMessageReceived(MessageEventData<object> data)
+    public async Task OnMessageReceived(MessageEventData data)
     {
         // TODO: Based on the topic, do the appropriate action
         Console.WriteLine($"[{data.Timestamp}] Received message: ({data.Topic} - {data.Id})");

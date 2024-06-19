@@ -4,6 +4,7 @@ namespace Shared.Repository.Interface
 {
     public interface IWriteRepository<in T> where T : Event
     {
-        Task Save(T @event);
+        Task CreateAsync(T entity);
+        Task UpdateAsync(T entity);
     }
 }
