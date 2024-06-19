@@ -2,5 +2,5 @@ namespace Shared.MessageBroker.Consumer.Interfaces;
 
 public interface IMessageConsumer
 {
-    Task ConsumeAsync<T>(Func<T, Task> onMessageReceived, IEnumerable<string> interestedTopics);
+    Task ConsumeAsync(Func<MessageEventData, Task> onMessageReceived, IEnumerable<string> interestedTopics);
 }
