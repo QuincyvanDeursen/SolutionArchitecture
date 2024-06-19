@@ -13,6 +13,7 @@ using Shared.MessageBroker.Publisher;
 using Shared.MessageBroker.Publisher.Interfaces;
 using CustomerService.Services.Interfaces;
 using CustomerService.Services;
+using CustomerService.Services.CronJob;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +24,8 @@ builder.Services.AddDbContext<CustomerDbContext>(
 // Add services to the container.
 builder.Services.AddScoped<ICustomerRepo, CustomerRepo>();
 builder.Services.AddScoped<ICustomerService, CustomerService.Services.CustomerService>();
-builder.Services.AddScoped<IExternalCustomerDataService, ExternalCustomerDataService>();
+
+builder.Services.AddHostedService<CronJobService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -52,6 +54,8 @@ builder.Services.AddSwaggerGen(
         // using System.Reflection;
         var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     });
+
+builder.Services.AddHttpClient();
 
 // Run migrations if in production
 if (builder.Environment.IsProduction())
