@@ -30,7 +30,7 @@ namespace OrderService.Controllers
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Order> Get(int id)
+        public ActionResult<Order> Get(Guid id)
         {
             var order = _orderRepo.GetOrder(id);
 
@@ -70,7 +70,7 @@ namespace OrderService.Controllers
         }
 
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public void Delete(Guid id)
         {
             _orderRepo.DeleteOrder(_orderRepo.GetOrder(id));
         }

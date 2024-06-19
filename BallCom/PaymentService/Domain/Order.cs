@@ -1,7 +1,10 @@
-﻿namespace OrderService.DTO
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PaymentService.Domain
 {
-    public class OrderDTO
+    public class Order
     {
+        [Key]
         public Guid Id { get; set; }
         public DateTime OrderDate { get; set; }
         public int CustomerId { get; set; }
@@ -9,7 +12,7 @@
         public string? Adress { get; set; }
         public string? Postalcode { get; set; }
         public string? City { get; set; }
-        public List<OrderItemDTO> OrderItems { get; set; }
-        
+        public ICollection<OrderItem>? OrderItems { get; set; }
+        public decimal Totalprice { get; set; } = 0;
     }
 }

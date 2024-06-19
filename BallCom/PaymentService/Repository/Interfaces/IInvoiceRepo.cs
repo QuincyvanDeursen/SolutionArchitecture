@@ -9,7 +9,7 @@ namespace PaymentService.Repository.Interfaces
         IEnumerable<Invoice> GetInvoiceByOrderId(int orderId);
 
         IEnumerable<Invoice> GetInvoiceByCustomerId(int customerId);
-        Invoice GetInvoice(int id);
+        Invoice GetInvoice(Guid id);
         void SaveInvoice(Invoice orderItem);
         void UpdateInvoice(Invoice orderItem);
         void DeleteInvoice(Invoice orderItem);

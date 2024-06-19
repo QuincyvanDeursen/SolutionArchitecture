@@ -17,12 +17,28 @@ namespace OrderService.Services
             _orderItemRepo = orderItemRepo;
         }
 
-        private async Task<bool> ProductsInStockAsync(Order order)
+        public async Task<bool> CreateOrder(Order order)
+        {
+            if (IsOrderWithinProductLimit(order.OrderItems))
+                if (await CheckStock(order))
+                {
+                    var result = await _orderRepo.SaveOrder(order);
+
+                    foreach (var orderItem in order.OrderItems)
+                    {
+                        orderItem.OrderId = result.Id;
+                        _orderItemRepo.SaveOrderItem(orderItem);
+                    }
+                    return true;
+                }
+            return false;
+        }
+        private async Task<bool> CheckStock(Order order)
         {
             foreach (var orderItem in order.OrderItems)
             {
-                var inventory = await _inventoryServiceClient.GetInventoryAsync(orderItem.ProductId);
-                if (inventory.Quantity < orderItem.Quantity)
+                var product = await _inventoryServiceClient.GetInventoryAsync(orderItem.ProductId);
+                if (product.Quantity < orderItem.Quantity)
                 {
                     throw new Exception($"Not enough inventory for product {orderItem.ProductId}");
                 }
@@ -30,26 +46,13 @@ namespace OrderService.Services
             return true;
         }
 
-        public async Task<bool> CreateOrder(Order order)
+        private bool IsOrderWithinProductLimit (ICollection<OrderItem> orderItems) 
         {
-            // Check if products are in stock
-            bool inStock = await ProductsInStockAsync(order);
-            if (inStock)
+            if(orderItems.Count <= 20)
             {
-                // Save the order
-                var result = await _orderRepo.SaveOrder(order);
-
-                foreach(var orderItem in order.OrderItems)
-                {
-                    orderItem.OrderId = result.Id;
-                    _orderItemRepo.SaveOrderItem(orderItem);
-                }
                 return true;
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
     }
 }

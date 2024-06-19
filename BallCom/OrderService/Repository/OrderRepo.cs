@@ -20,7 +20,7 @@ namespace OrderService.Repository
             _context.Orders.Remove(order);
         }
 
-        public Order GetOrder(int id)
+        public Order GetOrder(Guid id)
         {
             return _context.Orders.Include(order => order.OrderItems).First(i => i.Id == id);
         }

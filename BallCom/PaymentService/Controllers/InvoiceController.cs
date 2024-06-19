@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PaymentService.Domain;
+using PaymentService.Dto;
 using PaymentService.Repository.Interfaces;
+using PaymentService.Services.Interfaces;
 
 namespace PaymentService.Controllers
 {
@@ -12,11 +14,13 @@ namespace PaymentService.Controllers
 
         private readonly ILogger<InvoiceController> _logger;
         private readonly IInvoiceRepo _invoiceRepo;
+        private readonly IInvoiceService _invoiceService;
 
-        public InvoiceController(ILogger<InvoiceController> logger, IInvoiceRepo invoiceRepo)
+        public InvoiceController(ILogger<InvoiceController> logger, IInvoiceRepo invoiceRepo, IInvoiceService invoiceService)
         {
             _logger = logger;
             _invoiceRepo = invoiceRepo;
+            _invoiceService = invoiceService;
         }
 
         [HttpGet]
@@ -26,7 +30,7 @@ namespace PaymentService.Controllers
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Invoice> Get(int id)
+        public ActionResult<Invoice> Get(Guid id)
         {
             var invoice = _invoiceRepo.GetInvoice(id);
 
@@ -39,9 +43,20 @@ namespace PaymentService.Controllers
         }
 
         [HttpPost]
-        public void Post([FromBody] Invoice invoice)
+        public async Task<ActionResult> Post([FromBody] InvoiceCreateDto invoiceCreateDto)
         {
-            _invoiceRepo.SaveInvoice(invoice);
+            try
+            {
+                _logger.LogInformation("Adding new product");
+
+                await _invoiceService.CreateInvoice(invoiceCreateDto);
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPut]
@@ -51,7 +66,7 @@ namespace PaymentService.Controllers
         }
 
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public void Delete(Guid id)
         {
             _invoiceRepo.DeleteInvoice(_invoiceRepo.GetInvoice(id));
         }
