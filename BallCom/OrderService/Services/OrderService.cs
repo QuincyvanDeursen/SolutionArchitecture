@@ -1,4 +1,5 @@
 ﻿using OrderService.Domain;
+using OrderService.DTO;
 using OrderService.Repository.Interface;
 using OrderService.Services.Interface;
 
@@ -17,25 +18,36 @@ namespace OrderService.Services
             _orderItemRepo = orderItemRepo;
         }
 
-        public async Task<bool> CreateOrder(Order order)
+        public async Task<bool> CreateOrder(OrderCreateDto orderCreateDto)
         {
-            if (IsOrderWithinProductLimit(order.OrderItems))
-                if (await CheckStock(order))
+            if (IsOrderWithinProductLimit(orderCreateDto.OrderItems) && await CheckStock(orderCreateDto.OrderItems))
                 {
-                    var result = await _orderRepo.SaveOrder(order);
-
+                    var Id = Guid.NewGuid();
+                    var orderItems = ConvertToOrderItem(orderCreateDto.OrderItems, Id);
+                    var order = new Order
+                    {
+                        Id = Id,
+                        OrderDate = DateTime.Now,
+                        CustomerId = orderCreateDto.CustomerId,
+                        Address = orderCreateDto.Address,
+                        OrderItems = orderItems,
+                    };
+                    
+                    //Order opslaan
+                    await _orderRepo.SaveOrder(order);
+                    
+                    //Orderitems opslaan
                     foreach (var orderItem in order.OrderItems)
                     {
-                        orderItem.OrderId = result.Id;
                         _orderItemRepo.SaveOrderItem(orderItem);
                     }
                     return true;
                 }
             return false;
         }
-        private async Task<bool> CheckStock(Order order)
+        private async Task<bool> CheckStock(ICollection<OrderItemCreateDto> orderItems)
         {
-            foreach (var orderItem in order.OrderItems)
+            foreach (var orderItem in orderItems)
             {
                 var product = await _inventoryServiceClient.GetInventoryAsync(orderItem.ProductId);
                 if (product.Quantity < orderItem.Quantity)
@@ -46,13 +58,41 @@ namespace OrderService.Services
             return true;
         }
 
-        private bool IsOrderWithinProductLimit (ICollection<OrderItem> orderItems) 
+        private bool IsOrderWithinProductLimit (ICollection<OrderItemCreateDto> orderItems) 
         {
             if(orderItems.Count <= 20)
             {
                 return true;
             }
             return false;
+        }
+
+        private ICollection<OrderItem> ConvertToOrderItem(ICollection<OrderItemCreateDto> orderItemCreateDtos, Guid id)
+        {
+            var orderItems = new List<OrderItem>();
+            foreach(var item in orderItemCreateDtos)
+            {
+                var orderItem = new OrderItem
+                {
+                    Id = Guid.NewGuid(),
+                    OrderId = id,
+                    ProductName = item.ProductName,
+                    ProductId = item.ProductId,
+                    ProductPrice = item.ProductPrice,
+                    Quantity = item.Quantity
+                };
+            }
+            return orderItems;
+        }
+
+        public async Task<Order> GetOrderById(Guid id)
+        {
+            return await _orderRepo.GetOrder(id);
+        }
+
+        public async Task<IEnumerable<Order>> GetAllOrders()
+        {
+            return await _orderRepo.GetAllOrdersAsync();
         }
     }
 }

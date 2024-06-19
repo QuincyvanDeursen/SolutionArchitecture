@@ -12,18 +12,21 @@ namespace OrderService.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            var order1 = Guid.NewGuid();
+            var order2 = Guid.NewGuid();
+            var order3 = Guid.NewGuid();
             IEnumerable<Order> orders = new List<Order>
             {
-                new Order { Id = Guid.NewGuid(), OrderDate = DateTime.Now, CustomerId = 1, PaymentId = 1, Adress = "Pelmolenstraat 11A", Postalcode = "4811LR", City = "Breda" },
-                new Order { Id = Guid.NewGuid(), OrderDate = DateTime.Now, CustomerId = 2, PaymentId = 2, Adress = "Pelmolenstraat 101A", Postalcode = "4812LR", City = "Breda" },
-                new Order { Id = Guid.NewGuid(), OrderDate = DateTime.Now, CustomerId = 3, PaymentId = 3, Adress = "Pelmolenstraat 111A", Postalcode = "4813LR", City = "Breda" },
+                new Order { Id = order1, OrderDate = DateTime.Now, CustomerId = 1, PaymentId = 1, Address = "Pelmolenstraat 11A, 4811LR, Breda" },
+                new Order { Id = order2, OrderDate = DateTime.Now, CustomerId = 2, PaymentId = 2, Address = "Pelmolenstraat 11A, 4811LR, Breda" },
+                new Order { Id = order3, OrderDate = DateTime.Now, CustomerId = 3, PaymentId = 3, Address = "Pelmolenstraat 11A, 4811LR, Breda" },
             };
 
             IEnumerable<OrderItem> orderItems = new List<OrderItem>
             {
-                new OrderItem { Id = Guid.NewGuid(), OrderId = Guid.NewGuid(), ProductId = Guid.NewGuid(), Quantity = 1 },
-                new OrderItem { Id = Guid.NewGuid(), OrderId = Guid.NewGuid(), ProductId = Guid.NewGuid(), Quantity = 2 },
-                new OrderItem { Id = Guid.NewGuid(), OrderId = Guid.NewGuid(), ProductId = Guid.NewGuid(), Quantity = 3 },
+                new OrderItem { Id = Guid.NewGuid(), OrderId = order1, ProductId = Guid.NewGuid(), Quantity = 1 },
+                new OrderItem { Id = Guid.NewGuid(), OrderId = order2, ProductId = Guid.NewGuid(), Quantity = 2 },
+                new OrderItem { Id = Guid.NewGuid(), OrderId = order3, ProductId = Guid.NewGuid(), Quantity = 3 },
             };
 
 
