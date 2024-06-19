@@ -30,6 +30,12 @@ namespace OrderService.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Adress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
@@ -39,6 +45,9 @@ namespace OrderService.Migrations
                     b.Property<int?>("PaymentId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Postalcode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Orders");
@@ -47,23 +56,32 @@ namespace OrderService.Migrations
                         new
                         {
                             Id = 1,
+                            Adress = "Pelmolenstraat 11A",
+                            City = "Breda",
                             CustomerId = 1,
-                            OrderDate = new DateTime(2024, 6, 14, 17, 6, 1, 722, DateTimeKind.Local).AddTicks(5441),
-                            PaymentId = 1
+                            OrderDate = new DateTime(2024, 6, 17, 11, 0, 43, 991, DateTimeKind.Local).AddTicks(167),
+                            PaymentId = 1,
+                            Postalcode = "4811LR"
                         },
                         new
                         {
                             Id = 2,
+                            Adress = "Pelmolenstraat 101A",
+                            City = "Breda",
                             CustomerId = 2,
-                            OrderDate = new DateTime(2024, 6, 14, 17, 6, 1, 722, DateTimeKind.Local).AddTicks(5484),
-                            PaymentId = 2
+                            OrderDate = new DateTime(2024, 6, 17, 11, 0, 43, 991, DateTimeKind.Local).AddTicks(212),
+                            PaymentId = 2,
+                            Postalcode = "4812LR"
                         },
                         new
                         {
                             Id = 3,
+                            Adress = "Pelmolenstraat 111A",
+                            City = "Breda",
                             CustomerId = 3,
-                            OrderDate = new DateTime(2024, 6, 14, 17, 6, 1, 722, DateTimeKind.Local).AddTicks(5487),
-                            PaymentId = 3
+                            OrderDate = new DateTime(2024, 6, 17, 11, 0, 43, 991, DateTimeKind.Local).AddTicks(215),
+                            PaymentId = 3,
+                            Postalcode = "4813LR"
                         });
                 });
 

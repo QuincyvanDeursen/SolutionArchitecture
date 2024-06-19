@@ -34,6 +34,9 @@ namespace OrderService.Repository
                     OrderDate = o.OrderDate,
                     CustomerId = o.CustomerId,
                     PaymentId = o.PaymentId,
+                    Adress = o.Adress,
+                    Postalcode = o.Postalcode,
+                    City = o.City,
                     OrderItems = o.OrderItems.Select(oi => new OrderItemDTO
                     {
                         Id = oi.Id,

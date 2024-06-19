@@ -1,60 +1,89 @@
-using InventoryService.Domain;
-using InventoryService.EventHandlers.Interfaces;
-using InventoryService.Events;
+﻿using InventoryService.Domain;
+using InventoryService.Dto;
+using InventoryService.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Shared.Repository.Interface;
 
-namespace InventoryService.Endpoints
+namespace InventoryService.Controllers
 {
+    [ApiController]
+    [Route("/api/[controller]")]
     public class InventoryController : ControllerBase
     {
         private readonly ILogger<InventoryController> _logger;
-        private readonly IReadRepository<Inventory> _inventoryRepository;
-        private readonly IInventoryEventHandler _eventHandler;
+        private readonly IInventoryService _inventoryService;
 
-        public InventoryController(ILogger<InventoryController> logger, IReadRepository<Inventory> inventoryRepository,
-            IInventoryEventHandler eventHandler)
+        public InventoryController(ILogger<InventoryController> logger, IInventoryService inventoryService)
         {
-            _logger = logger;
-            _inventoryRepository = inventoryRepository;
-            _eventHandler = eventHandler;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _inventoryService = inventoryService;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Inventory>> Get()
+        public async Task<ActionResult<IEnumerable<Product>>> Get()
         {
-            return await _inventoryRepository.GetAllAsync();
+            try
+            {
+                _logger.LogInformation("Getting all products");
+
+                var products = await _inventoryService.GetAllProducts();
+
+                return Ok(products);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
-        [HttpGet]
-        public async Task<Inventory> Get(Guid id)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Product>> Get(Guid id)
         {
-            return await _inventoryRepository.GetByIdAsync(id);
+            try
+            {
+                _logger.LogInformation($"Getting product with id: {id}");
+
+                var result = await _inventoryService.GetProduct(id);
+
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPost]
-        public void Post([FromBody] Inventory inventory)
+        public async Task<ActionResult> Post([FromBody] ProductCreateDto productCreateDto)
         {
-            var inventoryEvent = new InventoryCreatedEvent(inventory.ProductId, inventory.Quantity);
+            try
+            {
+                _logger.LogInformation("Adding new product");
 
-            // Save the event to seperate table in the database
-            _eventHandler.Handle(inventoryEvent);
+                await _inventoryService.CreateEvent(productCreateDto);
 
-            // Save the inventory to the inventory table
-            _inventoryRepository.CreateAsync(inventory);
-
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
-        [HttpDelete]
-        public void Delete([FromBody] Inventory inventory)
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Update([FromBody] ProductUpdateDto productUpdateDto, Guid id)
         {
-            var inventoryEvent = new InventoryRemoveEvent(inventory.ProductId, inventory.Quantity);
+            try
+            {
+                _logger.LogInformation($"Updating product with id: {id}");
 
-            // Save the event to seperate table in the database
-            _eventHandler.Handle(inventoryEvent);
+                await _inventoryService.CreateUpdateEvent(id, productUpdateDto);
 
-            // Remove the inventory from the inventory table
-            _inventoryRepository.RemoveAsync(inventory);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
     }
 }

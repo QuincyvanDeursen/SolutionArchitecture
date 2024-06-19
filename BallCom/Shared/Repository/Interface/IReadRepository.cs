@@ -10,7 +10,5 @@ namespace Shared.Repository.Interface
     {
         Task<T> GetByIdAsync(Guid id);
         Task<IEnumerable<T>> GetAllAsync();
-        Task CreateAsync(T entity);
-        Task RemoveAsync(T entity);
     }
 }
