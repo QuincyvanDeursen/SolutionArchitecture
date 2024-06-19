@@ -12,11 +12,13 @@ namespace InventoryService.Services
     {
         private readonly IReadRepository<Product> _productReadRepo;
         private readonly IInventoryEventHandler _inventoryEventHandler;
+        private readonly IWriteRepository<InventoryBaseEvent> _eventWriteRepo;
 
-        public InventoryService(IReadRepository<Product> productReadRepo, IInventoryEventHandler inventoryEventHandler)
+        public InventoryService(IReadRepository<Product> productReadRepo, IInventoryEventHandler inventoryEventHandler, IWriteRepository<InventoryBaseEvent> eventWriteRepo)
         {
             _productReadRepo = productReadRepo;
             _inventoryEventHandler = inventoryEventHandler;
+            _eventWriteRepo = eventWriteRepo;
         }
 
         public async Task<IEnumerable<Product>> GetAllProducts()
@@ -41,7 +43,7 @@ namespace InventoryService.Services
             return result;
         }
 
-        public async Task AddProductToWriteDB(ProductCreateDto productCreateDto)
+        public async Task CreateEvent(ProductCreateDto productCreateDto)
         {
             var product = new Product
             {
@@ -53,13 +55,15 @@ namespace InventoryService.Services
             };
 
             var productJson = JsonConvert.SerializeObject(product);
-            var inventoryEvent = new InventoryCreatedEvent(productJson);
+            var inventoryEvent = new InventoryCreatedEvent(product, productJson);
+
+            await _eventWriteRepo.CreateAsync(inventoryEvent);
 
             // Save the event to seperate table in the database
             await _inventoryEventHandler.Handle(inventoryEvent);
         }
 
-        public async Task UpdateProductToWriteDB(Guid id, ProductUpdateDto productUpdateDto)
+        public async Task CreateUpdateEvent(Guid id, ProductUpdateDto productUpdateDto)
         {
             var oldProduct = await _productReadRepo.GetByIdAsync(id);
             if (oldProduct == null)
@@ -77,33 +81,10 @@ namespace InventoryService.Services
             };
 
             var productJson = JsonConvert.SerializeObject(product);
-            var inventoryEvent = new InventoryUpdateEvent(productJson);
+            var inventoryEvent = new InventoryUpdateEvent(oldProduct, productJson);
 
             // Save the event to seperate table in the database
             await _inventoryEventHandler.Handle(inventoryEvent);
-        }
-
-        public async Task UpdateProductToReadDB(Guid id, Product product)
-        {
-            var oldProduct = await GetProduct(id);
-
-            var quantity = oldProduct.Quantity + product.Quantity;
-
-            if (quantity < 0) { 
-                //TODO: cancel een update inventory en plaats bericht op bus met juiste label
-            }
-
-            var newProduct = new Product
-            {
-                Quantity = quantity
-            };
-
-            await _productReadRepo.UpdateAsync(id, newProduct);
-        }
-
-        public async Task AddProductToReadDB(Product product)
-        {
-            await _productReadRepo.CreateAsync(product);
         }
     }
 }

@@ -17,6 +17,7 @@ using Shared.MessageBroker.Consumer.Interfaces;
 using Shared.MessageBroker.Publisher;
 using Shared.MessageBroker.Publisher.Interfaces;
 using Shared.Repository.Interface;
+using InventoryService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +30,7 @@ builder.Services.AddScoped<IWriteRepository<InventoryBaseEvent>, InventoryWriteR
 builder.Services.AddScoped<IReadRepository<Product>, InventoryReadRepo>();
 builder.Services.AddScoped<IInventoryEventHandler, InventoryEventHandler>();
 builder.Services.AddScoped<IInventoryService, InventoryService.Services.InventoryService>();
+builder.Services.AddScoped<IEventHandlerService, EventHandlerService>();
 
 // Add RabbitMQ Publisher and Consumer services.
 var exchangeName = builder.Configuration.GetValue<string>("RabbitMQ:ExchangeName");

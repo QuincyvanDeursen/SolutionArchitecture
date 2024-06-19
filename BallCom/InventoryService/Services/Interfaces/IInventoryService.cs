@@ -8,9 +8,7 @@ namespace InventoryService.Services.Interfaces
     {
         Task<IEnumerable<Product>> GetAllProducts();
         Task<Product> GetProduct(Guid id);
-        Task AddProductToWriteDB(ProductCreateDto productCreateDto);
-        Task AddProductToReadDB(Product product);
-        Task UpdateProductToWriteDB(Guid id, ProductUpdateDto productUpdateDto);
-        Task UpdateProductToReadDB(Guid id, Product product);
+        Task CreateEvent(ProductCreateDto productCreateDto);
+        Task CreateUpdateEvent(Guid id, ProductUpdateDto productUpdateDto);
     }
 }

@@ -8,9 +8,9 @@ using Shared.MessageBroker.Consumer.Interfaces;
 
 namespace InventoryService.Services.RabbitMQ;
 
-public class InventoryMessageListenerService(IMessageConsumer messageConsumer, IInventoryService _inventoryService) : IHostedService
+public class InventoryMessageListenerService(IMessageConsumer messageConsumer, IEventHandlerService eventHandlerService) : IHostedService
 {
-    private readonly IInventoryService _inventoryService = _inventoryService;
+    private readonly IEventHandlerService _eventHandlerService = eventHandlerService;
     private readonly IMessageConsumer _messageConsumer = messageConsumer;
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -24,15 +24,15 @@ public class InventoryMessageListenerService(IMessageConsumer messageConsumer, I
 
     public async Task OnMessageReceived(MessageEventData<object> data)
     {
-        var product = (Product)data.Data;
-
         switch (data.Topic)
         {
             case "inventory.create":
-                await _inventoryService.AddProductToReadDB(product);
+                var createProduct = (Product)data.Data;
+                await _eventHandlerService.AddProduct(createProduct);
                 break;
             case "inventory.update":
-                await _inventoryService.UpdateProductToReadDB(product.Id, product);
+                var updateProduct = (Product)data.Data;
+                await _eventHandlerService.UpdateProduct(updateProduct);
                 break;
             default:
                 Console.WriteLine();
