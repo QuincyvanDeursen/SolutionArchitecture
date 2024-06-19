@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CustomerService.Controllers
 {
+    [ApiController]
     [Route("api/[controller]")]
     public class CustomerController : ControllerBase
     {
@@ -19,36 +20,71 @@ namespace CustomerService.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Customer>>> Get()
         {
-            var result = await _customerService.GetAll();
-            return Ok(result);
+            try
+            {
+                var result = await _customerService.GetAll();
+                return Ok(result);
+            } catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Customer>> Get(Guid id)
         {
-            var result = await _customerService.Get(id);
-            return Ok(result);
+            try
+            {
+                var result = await _customerService.Get(id);
+                return Ok(result);
+            } catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+
         }
 
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] CustomerCreateDto customer)
         {
-            await _customerService.Add(customer);
-            return Ok();
+            try
+            {
+                await _customerService.Add(customer);
+                return Ok();
+            } catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult> Put([FromBody] CustomerUpdateDto customer, Guid id)
         {
-            await _customerService.Update(id, customer);
-            return Ok();
+            try
+            {
+                await _customerService.Update(id, customer);
+                return Ok();
+            } catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(Guid id)
         {
-            await _customerService.Delete(id);
-            return Ok();
+            try
+            {
+                await _customerService.Delete(id);
+                return Ok();
+            } catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+
         }
     }
 }
