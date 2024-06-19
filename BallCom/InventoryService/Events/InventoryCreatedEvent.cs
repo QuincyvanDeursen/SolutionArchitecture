@@ -15,7 +15,6 @@ namespace InventoryService.Events
             Product = product;
             ProductJson = productJson;
         }
-        public string ProductJson { get; set; }
 
         public override void Accept(IInventoryEventHandler @event)
         {

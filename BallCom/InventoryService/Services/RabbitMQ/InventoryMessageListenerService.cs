@@ -5,38 +5,43 @@ using InventoryService.Dto;
 using InventoryService.Services.Interfaces;
 using Shared.MessageBroker;
 using Shared.MessageBroker.Consumer.Interfaces;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace InventoryService.Services.RabbitMQ;
 
-public class InventoryMessageListenerService(IMessageConsumer messageConsumer, IEventHandlerService eventHandlerService) : IHostedService
+public class InventoryMessageListenerService(IMessageConsumer messageConsumer, IServiceProvider serviceProvider) : IHostedService
 {
-    private readonly IEventHandlerService _eventHandlerService = eventHandlerService;
     private readonly IMessageConsumer _messageConsumer = messageConsumer;
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        await messageConsumer.ConsumeAsync<MessageEventData<object>>(OnMessageReceived, new []
+        await messageConsumer.ConsumeAsync(OnMessageReceived, new []
         {
             "inventory.create",
             "inventory.update"
         });
     }
 
-    public async Task OnMessageReceived(MessageEventData<object> data)
+    public async Task OnMessageReceived(MessageEventData data)
     {
+        // Create a new scope for the event handler service (scoped service)
+        using var scope = _serviceProvider.CreateScope();
+        var eventHandlerService = scope.ServiceProvider.GetService<IEventHandlerService>() ??
+                                  throw new ArgumentNullException(nameof(IEventHandlerService));
+        
         switch (data.Topic)
         {
             case "inventory.create":
-                var createProduct = (Product)data.Data;
-                await _eventHandlerService.AddProduct(createProduct);
+                var createProduct = JsonSerializer.Deserialize<Product>(data.DataJson);
+                await eventHandlerService.AddProduct(createProduct);
                 break;
             case "inventory.update":
-                var updateProduct = (Product)data.Data;
-                await _eventHandlerService.UpdateProduct(updateProduct);
+                var updateProduct = JsonSerializer.Deserialize<Product>(data.DataJson);
+                await eventHandlerService.AddProduct(updateProduct);
                 break;
             default:
-                Console.WriteLine();
-                throw new ArgumentException(data.Topic + " is not a listed topic.");
+                throw new ArgumentException(data.Topic + " is not a subscribed topic.");
         }
     }
 
