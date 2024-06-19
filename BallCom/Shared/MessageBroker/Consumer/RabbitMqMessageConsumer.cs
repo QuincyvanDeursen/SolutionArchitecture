@@ -61,12 +61,12 @@ public class RabbitMqMessageConsumer : IMessageConsumer
         
         // Create the consumer
         var consumer = new EventingBasicConsumer(channel);
-        consumer.Received += (sender, e) =>
+        consumer.Received += async (sender, e) =>
         {
             var body = e.Body.ToArray();
             var message = JsonSerializer.Deserialize<T>(Encoding.UTF8.GetString(body));
             Console.WriteLine(Encoding.UTF8.GetString(body));
-            onMessageReceived(message);
+            await onMessageReceived(message);
         };
         
         // Start consuming

@@ -6,8 +6,7 @@ namespace InventoryService.Events
 {
     public abstract class InventoryBaseEvent : Event
     {
-        public int ProductId { get; set; }
-        public int Quantity { get; set; }
+        public string Product { get; set; } = string.Empty;
         public abstract void Accept(IInventoryEventHandler @event);
     }
 }

@@ -1,0 +1,109 @@
+﻿using InventoryService.Domain;
+using InventoryService.Dto;
+using InventoryService.EventHandlers.Interfaces;
+using InventoryService.Events;
+using InventoryService.Services.Interfaces;
+using Newtonsoft.Json;
+using Shared.Repository.Interface;
+
+namespace InventoryService.Services
+{
+    public class InventoryService : IInventoryService
+    {
+        private readonly IReadRepository<Product> _productReadRepo;
+        private readonly IInventoryEventHandler _inventoryEventHandler;
+
+        public InventoryService(IReadRepository<Product> productReadRepo, IInventoryEventHandler inventoryEventHandler)
+        {
+            _productReadRepo = productReadRepo;
+            _inventoryEventHandler = inventoryEventHandler;
+        }
+
+        public async Task<IEnumerable<Product>> GetAllProducts()
+        {
+            var products = await _productReadRepo.GetAllAsync();
+            if (products == null || !products.Any())
+            {
+                throw new NullReferenceException();
+            }
+
+            return products;
+        }
+
+        public async Task<Product> GetProduct(Guid id)
+        {
+            var result = await _productReadRepo.GetByIdAsync(id);
+            if (result == null)
+            {
+                throw new NullReferenceException();
+            }
+
+            return result;
+        }
+
+        public async Task AddProductToWriteDB(ProductCreateDto productCreateDto)
+        {
+            var product = new Product
+            {
+                Id = Guid.NewGuid(),
+                Name = productCreateDto.Name,
+                Quantity = productCreateDto.Quantity,
+                Price = productCreateDto.Price,
+                Description = productCreateDto.Description
+            };
+
+            var productJson = JsonConvert.SerializeObject(product);
+            var inventoryEvent = new InventoryCreatedEvent(productJson);
+
+            // Save the event to seperate table in the database
+            await _inventoryEventHandler.Handle(inventoryEvent);
+        }
+
+        public async Task UpdateProductToWriteDB(Guid id, ProductUpdateDto productUpdateDto)
+        {
+            var oldProduct = await _productReadRepo.GetByIdAsync(id);
+            if (oldProduct == null)
+            {
+                throw new NullReferenceException("Product not found");
+            }
+
+            var product = new Product
+            {
+                Id = id,
+                Name = productUpdateDto.Name ?? oldProduct.Name,
+                Quantity = productUpdateDto.Quantity,
+                Price = productUpdateDto.Price ?? oldProduct.Price,
+                Description = productUpdateDto.Description ?? oldProduct.Description
+            };
+
+            var productJson = JsonConvert.SerializeObject(product);
+            var inventoryEvent = new InventoryUpdateEvent(productJson);
+
+            // Save the event to seperate table in the database
+            await _inventoryEventHandler.Handle(inventoryEvent);
+        }
+
+        public async Task UpdateProductToReadDB(Guid id, Product product)
+        {
+            var oldProduct = await GetProduct(id);
+
+            var quantity = oldProduct.Quantity + product.Quantity;
+
+            if (quantity < 0) { 
+                //TODO: cancel een update inventory en plaats bericht op bus met juiste label
+            }
+
+            var newProduct = new Product
+            {
+                Quantity = quantity
+            };
+
+            await _productReadRepo.UpdateAsync(id, newProduct);
+        }
+
+        public async Task AddProductToReadDB(Product product)
+        {
+            await _productReadRepo.CreateAsync(product);
+        }
+    }
+}
