@@ -3,17 +3,16 @@ using OrderService.EventHandlers.Interfaces;
 
 namespace OrderService.Events
 {
-    public class OrderUpdateEvent : OrderBaseEvent
+    public class OrderCancelledEvent : OrderBaseEvent
     {
-        public OrderUpdateEvent()
+        public OrderCancelledEvent()
         {
             // Parameterless constructor required by EF Core
         }
 
-        public OrderUpdateEvent(Order order, string productJson)
+        public OrderCancelledEvent(Order order)
         {
             Order = order;
-            OrderJson = productJson;
         }
         public override void Accept(IOrderEventHandler @event)
         {

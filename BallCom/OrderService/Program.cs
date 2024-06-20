@@ -33,9 +33,12 @@ builder.Services.AddSingleton<IMessageConsumer>(x => new RabbitMqMessageConsumer
 // Add a hosted service for listening to RabbitMQ messages (consumer).
 builder.Services.AddHostedService<OrderMessageListenerService>();
 
-builder.Services.AddScoped<IOrderService, OrderService.Services.OrderService>();
+builder.Services.AddScoped<IOrderService, OrderService.Services.RabbitMQ.OrderService>();
 builder.Services.AddScoped<IInventoryServiceClient, InventoryServiceClient>();
 builder.Services.AddControllers();
+
+builder.Services.AddHttpClient();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

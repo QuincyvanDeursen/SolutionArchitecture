@@ -12,6 +12,5 @@ namespace OrderService.Domain
         public decimal ProductPrice { get; set; }
         public int Quantity { get; set; }
         public Order Order { get; set; } 
-
     }
 }

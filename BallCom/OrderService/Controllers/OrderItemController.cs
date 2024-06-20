@@ -20,9 +20,9 @@ namespace OrderService.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<OrderItem> Get()
+        public async  Task<IEnumerable<OrderItem>> Get()
         {
-            return _orderItemRepo.GetOrderItems();
+            return await _orderItemRepo.GetOrderItems();
         }
 
         [HttpGet("{id}")]
@@ -60,9 +60,10 @@ namespace OrderService.Controllers
         }
 
         [HttpDelete("{id}")]
-        public void Delete(Guid id)
+        public async Task Delete(Guid id)
         {
-            _orderItemRepo.DeleteOrderItem(_orderItemRepo.GetOrderItem(id));
+            var item = await _orderItemRepo.GetOrderItem(id);
+            _orderItemRepo.DeleteOrderItem(item);
         }
     }
 }
