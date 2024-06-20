@@ -6,9 +6,9 @@ namespace InventoryService.Repository
 {
     public class ProductWriteRepo : IWriteRepository<Product>
     {
-        private readonly InventoryDbContext _context;
+        private readonly AppDbContext _context;
 
-        public ProductWriteRepo(InventoryDbContext context)
+        public ProductWriteRepo(AppDbContext context)
         {
             _context = context;
         }

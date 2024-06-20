@@ -11,6 +11,9 @@ using Shared.MessageBroker.Consumer;
 using Shared.MessageBroker.Consumer.Interfaces;
 using Shared.MessageBroker.Publisher;
 using Shared.MessageBroker.Publisher.Interfaces;
+using CustomerService.Services.Interfaces;
+using CustomerService.Services;
+using CustomerService.Services.CronJob;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,18 +22,10 @@ builder.Services.AddDbContext<CustomerDbContext>(
     options => options.UseSqlServer(connectionString));
 
 // Add services to the container.
-builder.Services.AddScoped<ICustomerRepo, CustomerEFRepo>();
+builder.Services.AddScoped<ICustomerRepo, CustomerRepo>();
+builder.Services.AddScoped<ICustomerService, CustomerService.Services.CustomerService>();
 
-// Add RabbitMQ Publisher and Consumer services.
-var exchangeName = builder.Configuration.GetValue<string>("RabbitMQ:ExchangeName");
-var queueName = builder.Configuration.GetValue<string>("RabbitMQ:QueueName");
-
-builder.Services.AddSingleton<IConnectionProvider>(x => new RabbitMqConnectionProvider(builder.Configuration.GetValue<string>("RabbitMQ:Uri") ?? ""));
-builder.Services.AddSingleton<IMessagePublisher>(x => new RabbitMqMessagePublisher(x.GetService<IConnectionProvider>(), exchangeName));
-builder.Services.AddSingleton<IMessageConsumer>(x => new RabbitMqMessageConsumer(x.GetService<IConnectionProvider>(), exchangeName, queueName));
-
-// Add a hosted service for listening to RabbitMQ messages (consumer).
-builder.Services.AddHostedService<CustomerMessageListenerService>();
+builder.Services.AddHostedService<CronJobService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -60,9 +55,22 @@ builder.Services.AddSwaggerGen(
         var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     });
 
+builder.Services.AddHttpClient();
+
 // Run migrations if in production
 if (builder.Environment.IsProduction())
 {
+    // Add RabbitMQ Publisher and Consumer services.
+    var exchangeName = builder.Configuration.GetValue<string>("RabbitMQ:ExchangeName");
+    var queueName = builder.Configuration.GetValue<string>("RabbitMQ:QueueName");
+
+    builder.Services.AddSingleton<IConnectionProvider>(x => new RabbitMqConnectionProvider(builder.Configuration.GetValue<string>("RabbitMQ:Uri") ?? ""));
+    builder.Services.AddSingleton<IMessagePublisher>(x => new RabbitMqMessagePublisher(x.GetService<IConnectionProvider>(), exchangeName));
+    builder.Services.AddSingleton<IMessageConsumer>(x => new RabbitMqMessageConsumer(x.GetService<IConnectionProvider>(), exchangeName, queueName));
+
+    // Add a hosted service for listening to RabbitMQ messages (consumer).
+    builder.Services.AddHostedService<CustomerMessageListenerService>();
+
     using var scope = builder.Services.BuildServiceProvider().CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<CustomerDbContext>();
     dbContext.Database.Migrate();

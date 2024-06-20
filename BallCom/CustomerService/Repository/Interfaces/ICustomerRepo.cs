@@ -4,10 +4,10 @@ namespace CustomerService.Repository.Interfaces
 {
     public interface ICustomerRepo
     {
-        IEnumerable<Customer> GetCustomers();
-        Customer GetCustomer(int id);
-        void AddCustomer(Customer customer);
-        void UpdateCustomer(Customer customer);
-        void DeleteCustomer(int id);
+        Task<IEnumerable<Customer>> GetAllCustomers();
+        Task<Customer> GetCustomer(Guid id);
+        Task AddCustomer(Customer customer);
+        Task UpdateCustomer(Customer customer);
+        Task DeleteCustomer(Guid id);
     }
 }

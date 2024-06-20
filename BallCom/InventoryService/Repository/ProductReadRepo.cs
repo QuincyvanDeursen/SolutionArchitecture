@@ -5,11 +5,11 @@ using Shared.Repository.Interface;
 
 namespace InventoryService.Repository
 {
-    public class InventoryReadRepo : IReadRepository<Product>
+    public class ProductReadRepo : IReadRepository<Product>
     {
-        private readonly InventoryDbContext context;
+        private readonly AppDbContext context;
 
-        public InventoryReadRepo(InventoryDbContext context)
+        public ProductReadRepo(AppDbContext context)
         {
             this.context = context ?? throw new ArgumentNullException(nameof(context));
         }

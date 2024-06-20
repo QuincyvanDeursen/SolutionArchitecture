@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InventoryService.Database
 {
-    public class InventoryDbContext : DbContext
+    public class AppDbContext : DbContext
     {
         public DbSet<Product> Products { get; set; }
-        public DbSet<InventoryBaseEvent> InventoryEvents { get; set; }
+        public DbSet<ProductBaseEvent> ProductEvents { get; set; }
 
 
-        public InventoryDbContext(DbContextOptions<InventoryDbContext> options) : base(options)
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
 
@@ -26,13 +26,13 @@ namespace InventoryService.Database
             modelBuilder.Entity<Product>().HasKey(p => p.Id);
             modelBuilder.Entity<Product>().HasData(products);
 
-            modelBuilder.Entity<InventoryBaseEvent>().Ignore(p => p.Product);
+            modelBuilder.Entity<ProductBaseEvent>().Ignore(p => p.Product);
 
-            modelBuilder.Entity<InventoryBaseEvent>().HasKey(ie => ie.Id);
-            modelBuilder.Entity<InventoryBaseEvent>()
+            modelBuilder.Entity<ProductBaseEvent>().HasKey(ie => ie.Id);
+            modelBuilder.Entity<ProductBaseEvent>()
                 .HasDiscriminator<string>("EventType")
-                .HasValue<InventoryCreatedEvent>("InventoryCreate")
-                .HasValue<InventoryUpdateEvent>("InventoryUpdate");
+                .HasValue<ProductCreateEvent>("InventoryCreate")
+                .HasValue<ProductUpdateEvent>("InventoryUpdate");
         }
     }
 }

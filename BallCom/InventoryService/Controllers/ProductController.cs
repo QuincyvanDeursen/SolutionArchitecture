@@ -7,15 +7,15 @@ namespace InventoryService.Controllers
 {
     [ApiController]
     [Route("/api/[controller]")]
-    public class InventoryController : ControllerBase
+    public class ProductController : ControllerBase
     {
-        private readonly ILogger<InventoryController> _logger;
-        private readonly IInventoryService _inventoryService;
+        private readonly ILogger<ProductController> _logger;
+        private readonly IProductService _productService;
 
-        public InventoryController(ILogger<InventoryController> logger, IInventoryService inventoryService)
+        public ProductController(ILogger<ProductController> logger, IProductService productService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _inventoryService = inventoryService;
+            _productService = productService;
         }
 
         [HttpGet]
@@ -25,7 +25,7 @@ namespace InventoryService.Controllers
             {
                 _logger.LogInformation("Getting all products");
 
-                var products = await _inventoryService.GetAllProducts();
+                var products = await _productService.GetAllProducts();
 
                 return Ok(products);
             }
@@ -42,7 +42,7 @@ namespace InventoryService.Controllers
             {
                 _logger.LogInformation($"Getting product with id: {id}");
 
-                var result = await _inventoryService.GetProduct(id);
+                var result = await _productService.GetProduct(id);
 
                 return Ok(result);
             }
@@ -59,9 +59,10 @@ namespace InventoryService.Controllers
             {
                 _logger.LogInformation("Adding new product");
 
-                await _inventoryService.CreateEvent(productCreateDto);
+                // Create the product and publish the event to the message broker
+                await _productService.SendCreateEvent(productCreateDto);
 
-                return Ok();
+                return Ok("Product Created");
             }
             catch (Exception e)
             {
@@ -76,9 +77,27 @@ namespace InventoryService.Controllers
             {
                 _logger.LogInformation($"Updating product with id: {id}");
 
-                await _inventoryService.CreateUpdateEvent(id, productUpdateDto);
+                // Update the product and publish the event to the message broker
+                await _productService.SendUpdateEvent(id, productUpdateDto);
 
-                return Ok();
+                return Ok("Product Updated");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPost("/checkstock")]
+        public async Task<ActionResult> CheckStock([FromBody] List<ProductStockDto> productsFromOrder)
+        {
+            try
+            {
+                _logger.LogInformation($"Checking stock for products");
+
+                var result = await _productService.CheckStock(productsFromOrder);
+
+                return Ok(result);
             }
             catch (Exception e)
             {
