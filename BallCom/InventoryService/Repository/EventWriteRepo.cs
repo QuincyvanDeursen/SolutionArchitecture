@@ -7,11 +7,11 @@ namespace InventoryService.Repository
 {   
 
     // This class is responsible for saving and deleting events in the database (Event sourcing)
-    public class InventoryWriteRepo : IWriteRepository<InventoryBaseEvent>
+    public class EventWriteRepo : IWriteRepository<InventoryBaseEvent>
     {
         private readonly InventoryDbContext _context;
 
-        public InventoryWriteRepo(InventoryDbContext context)
+        public EventWriteRepo(InventoryDbContext context)
         {
             _context = context;
         }

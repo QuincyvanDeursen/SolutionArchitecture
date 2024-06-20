@@ -2,42 +2,46 @@
 using InventoryService.Domain;
 using InventoryService.Dto;
 using InventoryService.Events;
+using InventoryService.Repository;
 using InventoryService.Services.Interfaces;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Text.Json;
 
 namespace InventoryService.Services
 {
     public class EventHandlerService : IEventHandlerService
     {
-        private readonly InventoryDbContext _context;
+        private readonly EventWriteRepo _eventWriteRepo;
+        private readonly ProductWriteRepo _productWriteRepo;
 
-        public EventHandlerService(InventoryDbContext inventoryDbContext)
+        public EventHandlerService(EventWriteRepo eventWriteRepo, ProductWriteRepo productWriteRepo)
         {
-            _context = inventoryDbContext;   
-        }
-        public async Task AddProduct(Product product)
-        {
-            await _context.Products.AddAsync(product);
-            await _context.SaveChangesAsync();
+            this._eventWriteRepo = eventWriteRepo;
+            _productWriteRepo = productWriteRepo;
         }
 
-        public async Task UpdateProduct(Product product)
+        public async Task ProcessProductCreatedEvent(Product product)
         {
-            var oldProduct = await _context.Products.FindAsync(product.Id);
-
-            if (oldProduct == null)
+            var productCreatedEvent = new InventoryCreatedEvent
             {
-                throw new KeyNotFoundException();
-            }
+                Product = product,
+                ProductJson = JsonSerializer.Serialize(product)
+            };
 
-            var quantity = oldProduct.Quantity + product.Quantity;
+            await _eventWriteRepo.CreateAsync(productCreatedEvent);
+            await _productWriteRepo.CreateAsync(product);
+        }
 
-            if (quantity < 0)
+        public async Task ProcessProductUpdatedEvent(Product product)
+        {
+            var productUpdatedEvent = new InventoryUpdateEvent
             {
-                //TODO: cancel een update inventory en plaats bericht op bus met juiste label
-            }
+                Product = product,
+                ProductJson = JsonSerializer.Serialize(product)
+            };
 
-            _context.Products.Update(oldProduct);
-            await _context.SaveChangesAsync();
+            await _eventWriteRepo.CreateAsync(productUpdatedEvent);
+            await _productWriteRepo.UpdateAsync(product);
         }
     }
 }
