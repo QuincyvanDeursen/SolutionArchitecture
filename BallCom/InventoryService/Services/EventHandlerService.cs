@@ -6,20 +6,15 @@ using InventoryService.Repository;
 using InventoryService.Services.Interfaces;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Text.Json;
+using Shared.Repository.Interface;
 
 namespace InventoryService.Services
 {
-    public class EventHandlerService : IEventHandlerService
+    public class EventHandlerService(
+        IWriteRepository<InventoryBaseEvent> eventWriteRepo,
+        IWriteRepository<Product> productWriteRepo)
+        : IEventHandlerService
     {
-        private readonly EventWriteRepo _eventWriteRepo;
-        private readonly ProductWriteRepo _productWriteRepo;
-
-        public EventHandlerService(EventWriteRepo eventWriteRepo, ProductWriteRepo productWriteRepo)
-        {
-            this._eventWriteRepo = eventWriteRepo;
-            _productWriteRepo = productWriteRepo;
-        }
-
         public async Task ProcessProductCreatedEvent(Product product)
         {
             var productCreatedEvent = new InventoryCreatedEvent
@@ -28,8 +23,8 @@ namespace InventoryService.Services
                 ProductJson = JsonSerializer.Serialize(product)
             };
 
-            await _eventWriteRepo.CreateAsync(productCreatedEvent);
-            await _productWriteRepo.CreateAsync(product);
+            await eventWriteRepo.CreateAsync(productCreatedEvent);
+            await productWriteRepo.CreateAsync(product);
         }
 
         public async Task ProcessProductUpdatedEvent(Product product)
@@ -40,8 +35,8 @@ namespace InventoryService.Services
                 ProductJson = JsonSerializer.Serialize(product)
             };
 
-            await _eventWriteRepo.CreateAsync(productUpdatedEvent);
-            await _productWriteRepo.UpdateAsync(product);
+            await eventWriteRepo.CreateAsync(productUpdatedEvent);
+            await productWriteRepo.UpdateAsync(product);
         }
     }
 }
