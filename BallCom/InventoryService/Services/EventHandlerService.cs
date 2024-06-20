@@ -11,13 +11,13 @@ using Shared.Repository.Interface;
 namespace InventoryService.Services
 {
     public class EventHandlerService(
-        IWriteRepository<InventoryBaseEvent> eventWriteRepo,
+        IWriteRepository<ProductBaseEvent> eventWriteRepo,
         IWriteRepository<Product> productWriteRepo)
         : IEventHandlerService
     {
         public async Task ProcessProductCreatedEvent(Product product)
         {
-            var productCreatedEvent = new InventoryCreatedEvent
+            var productCreatedEvent = new ProductCreateEvent
             {
                 Product = product,
                 ProductJson = JsonSerializer.Serialize(product)
@@ -29,7 +29,7 @@ namespace InventoryService.Services
 
         public async Task ProcessProductUpdatedEvent(Product product)
         {
-            var productUpdatedEvent = new InventoryUpdateEvent
+            var productUpdatedEvent = new ProductUpdateEvent
             {
                 Product = product,
                 ProductJson = JsonSerializer.Serialize(product)

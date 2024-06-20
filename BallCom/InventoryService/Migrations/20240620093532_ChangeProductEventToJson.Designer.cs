@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace InventoryService.Migrations
 {
-    [DbContext(typeof(InventoryDbContext))]
+    [DbContext(typeof(AppDbContext))]
     [Migration("20240620093532_ChangeProductEventToJson")]
     partial class ChangeProductEventToJson
     {
