@@ -2,42 +2,41 @@
 using InventoryService.Domain;
 using InventoryService.Dto;
 using InventoryService.Events;
+using InventoryService.Repository;
 using InventoryService.Services.Interfaces;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Text.Json;
+using Shared.Repository.Interface;
 
 namespace InventoryService.Services
 {
-    public class EventHandlerService : IEventHandlerService
+    public class EventHandlerService(
+        IWriteRepository<InventoryBaseEvent> eventWriteRepo,
+        IWriteRepository<Product> productWriteRepo)
+        : IEventHandlerService
     {
-        private readonly InventoryDbContext _context;
-
-        public EventHandlerService(InventoryDbContext inventoryDbContext)
+        public async Task ProcessProductCreatedEvent(Product product)
         {
-            _context = inventoryDbContext;   
-        }
-        public async Task AddProduct(Product product)
-        {
-            await _context.Products.AddAsync(product);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task UpdateProduct(Product product)
-        {
-            var oldProduct = await _context.Products.FindAsync(product.Id);
-
-            if (oldProduct == null)
+            var productCreatedEvent = new InventoryCreatedEvent
             {
-                throw new KeyNotFoundException();
-            }
+                Product = product,
+                ProductJson = JsonSerializer.Serialize(product)
+            };
 
-            var quantity = oldProduct.Quantity + product.Quantity;
+            await eventWriteRepo.CreateAsync(productCreatedEvent);
+            await productWriteRepo.CreateAsync(product);
+        }
 
-            if (quantity < 0)
+        public async Task ProcessProductUpdatedEvent(Product product)
+        {
+            var productUpdatedEvent = new InventoryUpdateEvent
             {
-                //TODO: cancel een update inventory en plaats bericht op bus met juiste label
-            }
+                Product = product,
+                ProductJson = JsonSerializer.Serialize(product)
+            };
 
-            _context.Products.Update(oldProduct);
-            await _context.SaveChangesAsync();
+            await eventWriteRepo.CreateAsync(productUpdatedEvent);
+            await productWriteRepo.UpdateAsync(product);
         }
     }
 }

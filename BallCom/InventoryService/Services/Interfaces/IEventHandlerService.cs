@@ -5,7 +5,7 @@ namespace InventoryService.Services.Interfaces
 {
     public interface IEventHandlerService
     {
-        Task AddProduct(Product product);
-        Task UpdateProduct(Product product);
+        Task ProcessProductCreatedEvent(Product product);
+        Task ProcessProductUpdatedEvent(Product product);
     }
 }
