@@ -26,7 +26,7 @@ namespace OrderService.Controllers
         }
 
         [HttpGet("{id}")]
-        public ActionResult<OrderItem> Get(int id)
+        public ActionResult<OrderItem> Get(Guid id)
         {
             var orderItem = _orderItemRepo.GetOrderItem(id);
             if (orderItem == null)
@@ -37,7 +37,7 @@ namespace OrderService.Controllers
         }
 
         [HttpGet("order/{orderId}")]
-        public ActionResult<IEnumerable<OrderItem>> GetOrderItemsByOrderId(int orderId)
+        public ActionResult<IEnumerable<OrderItem>> GetOrderItemsByOrderId(Guid orderId)
         {
             var orderItems = _orderItemRepo.GetOrderItemsByOrderId(orderId);
             if (orderItems == null || !orderItems.Any())
@@ -60,7 +60,7 @@ namespace OrderService.Controllers
         }
 
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public void Delete(Guid id)
         {
             _orderItemRepo.DeleteOrderItem(_orderItemRepo.GetOrderItem(id));
         }

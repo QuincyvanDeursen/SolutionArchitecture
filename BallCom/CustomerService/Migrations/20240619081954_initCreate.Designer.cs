@@ -4,6 +4,7 @@ using CustomerService.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CustomerService.Migrations
 {
     [DbContext(typeof(CustomerDbContext))]
-    partial class CustomerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240619081954_initCreate")]
+    partial class initCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,30 +58,30 @@ namespace CustomerService.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("9b9c24d5-1f47-40ef-800b-09cfe8e5c89b"),
+                            Id = new Guid("82b5a43e-0ab3-4ac7-9dc2-e9ed2b2d22d9"),
                             Address = "Avansstraat 123, 1234AB Breda",
                             CompanyName = "ICTutor",
                             FirstName = "Sybrand",
                             LastName = "Bos",
-                            PhoneNumber = "0612345678"
+                            PhoneNumber = ""
                         },
                         new
                         {
-                            Id = new Guid("1d11cc97-809b-45b1-b096-516140f71f93"),
+                            Id = new Guid("78151e52-a564-460e-8d4d-7d58bcd49890"),
                             Address = "Avansstraat 123, 1234AB Breda",
                             CompanyName = "Willy's",
                             FirstName = "Tristan",
                             LastName = "Goossens",
-                            PhoneNumber = "0612345678"
+                            PhoneNumber = ""
                         },
                         new
                         {
-                            Id = new Guid("532cd2ef-1ed8-4624-b780-101e34d28a8e"),
+                            Id = new Guid("ea043a64-8f06-41fb-9b54-b143d911bcfb"),
                             Address = "Avansstraat 123, 1234AB Breda",
                             CompanyName = "Dropshipper",
                             FirstName = "Thimo",
                             LastName = "Luijsterburg",
-                            PhoneNumber = "0612345678"
+                            PhoneNumber = ""
                         });
                 });
 #pragma warning restore 612, 618

@@ -12,12 +12,12 @@ namespace OrderService.Services
             _httpClient = new HttpClient();
         }
 
-        public async Task<Inventory> GetInventoryAsync(int productId)
+        public async Task<Product> GetInventoryAsync(Guid productId)
         {
             var response = await _httpClient.GetAsync($"/api/inventory/{productId}");
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<Inventory>(content);
+            return JsonConvert.DeserializeObject<Product>(content);
         }
     }
 }
