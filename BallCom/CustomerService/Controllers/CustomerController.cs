@@ -1,49 +1,91 @@
 ﻿using CustomerService.Domain;
-using CustomerService.Repository;
-using CustomerService.Repository.Interfaces;
+using CustomerService.Dto;
+using CustomerService.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CustomerService.Controllers
 {
+    [ApiController]
     [Route("api/[controller]")]
     public class CustomerController : ControllerBase
     {
         private readonly ILogger<CustomerController> _logger;
-        private readonly ICustomerRepo _customerRepo;
-        public CustomerController(ILogger<CustomerController> logger, ICustomerRepo customerRepo)
+        private readonly ICustomerService _customerService;
+        public CustomerController(ILogger<CustomerController> logger, ICustomerService customerService)
         {
-            _logger = logger;
-            _customerRepo = customerRepo;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _customerService = customerService ?? throw new ArgumentNullException(nameof(customerService));
         }
 
         [HttpGet]
-        public IEnumerable<Customer> Get()
+        public async Task<ActionResult<IEnumerable<Customer>>> Get()
         {
-            return _customerRepo.GetCustomers();
+            try
+            {
+                var result = await _customerService.GetAll();
+                return Ok(result);
+            } catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+
         }
 
         [HttpGet("{id}")]
-        public Customer Get(int id)
+        public async Task<ActionResult<Customer>> Get(Guid id)
         {
-            return _customerRepo.GetCustomer(id);
+            try
+            {
+                var result = await _customerService.Get(id);
+                return Ok(result);
+            } catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+
         }
 
         [HttpPost]
-        public void Post([FromBody] Customer customer)
+        public async Task<ActionResult> Post([FromBody] CustomerCreateDto customer)
         {
-            _customerRepo.AddCustomer(customer);
+            try
+            {
+                await _customerService.Add(customer);
+                return Ok();
+            } catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+
         }
 
-        [HttpPut]
-        public void Put([FromBody] Customer customer)
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Put([FromBody] CustomerUpdateDto customer, Guid id)
         {
-            _customerRepo.UpdateCustomer(customer);
+            try
+            {
+                await _customerService.Update(id, customer);
+                return Ok();
+            } catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+
         }
 
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<ActionResult> Delete(Guid id)
         {
-            _customerRepo.DeleteCustomer(id);
+            try
+            {
+                await _customerService.Delete(id);
+                return Ok();
+            } catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+
         }
+        
     }
 }
