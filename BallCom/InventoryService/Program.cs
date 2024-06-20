@@ -23,13 +23,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("Default");
-builder.Services.AddDbContext<InventoryDbContext>(
+builder.Services.AddDbContext<AppDbContext>(
     options => options.UseSqlServer(connectionString));
 
-builder.Services.AddScoped<IWriteRepository<InventoryBaseEvent>, EventWriteRepo>();
-builder.Services.AddScoped<IReadRepository<Product>, InventoryReadRepo>();
-builder.Services.AddScoped<IInventoryEventHandler, InventoryEventHandler>();
-builder.Services.AddScoped<IInventoryService, InventoryService.Services.InventoryService>();
+builder.Services.AddScoped<IWriteRepository<ProductBaseEvent>, ProductEventWriteRepo>();
+builder.Services.AddScoped<IReadRepository<Product>, ProductReadRepo>();
+builder.Services.AddScoped<IProductEventHandler, ProductEventHandler>();
+builder.Services.AddScoped<IProductService, InventoryService.Services.ProductService>();
 builder.Services.AddScoped<IWriteRepository<Product>, ProductWriteRepo>();
 builder.Services.AddScoped<IEventHandlerService, EventHandlerService>();
 
@@ -43,7 +43,7 @@ builder.Services.AddSingleton<IMessageConsumer>(x => new RabbitMqMessageConsumer
 
 
 // Add hosted service for listening to RabbitMQ messages.
-builder.Services.AddHostedService<InventoryMessageListenerService>();
+builder.Services.AddHostedService<ProductMessageListenerService>();
 
 builder.Services.AddControllers();
 
@@ -79,7 +79,7 @@ if (builder.Environment.IsProduction())
 {
     // TODO: Re-activate migrations when it is fixed
     using var scope = builder.Services.BuildServiceProvider().CreateScope();
-    var dbContext = scope.ServiceProvider.GetRequiredService<InventoryDbContext>();
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     dbContext.Database.Migrate();
 }
 

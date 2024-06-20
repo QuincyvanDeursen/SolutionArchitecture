@@ -1,9 +1,11 @@
-﻿using InventoryService.Domain;
+﻿using InventoryService.Events;
+using Shared.EventSourcing;
 
 namespace InventoryService.EventHandlers.Interfaces
 {
     public interface IProductEventHandler
     {
-        void Handle(Product product);
+        Task Handle(ProductCreateEvent @event);
+        Task Handle(ProductUpdateEvent @event);
     }
 }
