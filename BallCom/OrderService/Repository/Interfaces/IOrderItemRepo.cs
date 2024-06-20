@@ -6,8 +6,8 @@ namespace OrderService.Repository.Interface
     {
             IEnumerable<OrderItem> GetOrderItems();
 
-            IEnumerable<OrderItem> GetOrderItemsByOrderId(int orderId);
-            OrderItem GetOrderItem(int id);
+            IEnumerable<OrderItem> GetOrderItemsByOrderId(Guid orderId);
+            OrderItem GetOrderItem(Guid id);
             void SaveOrderItem(OrderItem orderItem);
             void UpdateOrderItem(OrderItem orderItem);
             void DeleteOrderItem(OrderItem orderItem);

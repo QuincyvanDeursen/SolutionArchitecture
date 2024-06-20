@@ -16,7 +16,7 @@ namespace OrderService.Repository
             _context.OrderItems.Remove(orderItem);
         }
 
-        public OrderItem GetOrderItem(int id)
+        public OrderItem GetOrderItem(Guid id)
         {
            return  _context.OrderItems.First(i => i.Id == id);
         }
@@ -26,7 +26,7 @@ namespace OrderService.Repository
             return _context.OrderItems.ToList();
         }
 
-        public IEnumerable<OrderItem> GetOrderItemsByOrderId(int orderId)
+        public IEnumerable<OrderItem> GetOrderItemsByOrderId(Guid orderId)
         {
             return _context.OrderItems.Where(i => i.OrderId == orderId).ToList();
         }

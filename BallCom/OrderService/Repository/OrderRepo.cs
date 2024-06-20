@@ -20,32 +20,13 @@ namespace OrderService.Repository
             _context.Orders.Remove(order);
         }
 
-        public Order GetOrder(int id)
+        public async Task<Order> GetOrder(Guid id)
         {
             return _context.Orders.Include(order => order.OrderItems).First(i => i.Id == id);
         }
-        public async Task<IEnumerable<OrderDTO>> GetAllOrdersAsync()
+        public async Task<IEnumerable<Order>> GetAllOrdersAsync()
         {
-            var orders = await _context.Orders
-                .Include(o => o.OrderItems)
-                .Select(o => new OrderDTO
-                {
-                    Id = o.Id,
-                    OrderDate = o.OrderDate,
-                    CustomerId = o.CustomerId,
-                    PaymentId = o.PaymentId,
-                    Adress = o.Adress,
-                    Postalcode = o.Postalcode,
-                    City = o.City,
-                    OrderItems = o.OrderItems.Select(oi => new OrderItemDTO
-                    {
-                        Id = oi.Id,
-                        ProductId = oi.ProductId,
-                        Quantity = oi.Quantity
-                    }).ToList()
-                }).ToListAsync();
-
-            return orders;
+            return await _context.Orders.Include(o => o.OrderItems).ToListAsync();
         }
 
         public async Task<Order> SaveOrder(Order order)
