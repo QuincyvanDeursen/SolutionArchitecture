@@ -5,6 +5,6 @@ namespace OrderService.Services.Interface
 {
     public interface IInventoryServiceClient
     {
-        public Task<bool> GetInventoryAsync(List<ProductStockDto> productsFromOrder);
+        public Task<bool> CheckStockAsync(List<ProductStockDto> productsFromOrder);
     }
 }

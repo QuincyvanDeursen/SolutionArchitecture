@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OrderService.Domain;
 using OrderService.Repository.Interface;
-using OrderService.Services.Interface;
 
 namespace OrderService.Controllers
 {

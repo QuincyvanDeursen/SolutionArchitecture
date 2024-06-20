@@ -1,7 +1,6 @@
 ﻿using OrderService.EventHandlers.Interfaces;
 using OrderService.Events;
 using Shared.MessageBroker.Publisher.Interfaces;
-using Shared.Repository.Interface;
 
 namespace OrderService.EventHandlers
 {

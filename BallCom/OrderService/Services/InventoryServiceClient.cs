@@ -17,13 +17,12 @@ namespace OrderService.Services
             _logger = logger;
         }
 
-        public async Task<bool> GetInventoryAsync(List<ProductStockDto> productsFromOrder)
+        public async Task<bool> CheckStockAsync(List<ProductStockDto> productsFromOrder)
         {
             try
             {
                 var json = JsonConvert.SerializeObject(productsFromOrder);
                 var data = new StringContent(json, Encoding.UTF8, "application/json");
-            http://localhost:3002/checkstock
                 var response = await _httpClient.PostAsync("http://host.docker.internal:3002/api/Product/checkstock", data);
                 response.EnsureSuccessStatusCode(); // This ensures the HTTP status code is success (2xx range)
 

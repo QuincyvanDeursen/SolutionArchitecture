@@ -4,7 +4,6 @@ using InventoryService.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -12,11 +11,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InventoryService.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240617124857_initialCreate")]
-    partial class initialCreate
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,7 +49,7 @@ namespace InventoryService.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("20958433-57e6-405b-8373-e00f45198850"),
+                            Id = new Guid("e53ece0f-74e5-48e9-b346-c1939dacf846"),
                             Description = "HP Envy 16x",
                             Name = "Laptop",
                             Price = 799.0m,
@@ -60,7 +57,7 @@ namespace InventoryService.Migrations
                         },
                         new
                         {
-                            Id = new Guid("e18f3437-9537-4cc4-85a2-cf94e5d6f626"),
+                            Id = new Guid("2b81379b-7034-4e29-bb9f-83ea196e8b08"),
                             Description = "Logitech MX Master",
                             Name = "Mouse",
                             Price = 40.0m,
@@ -68,7 +65,7 @@ namespace InventoryService.Migrations
                         },
                         new
                         {
-                            Id = new Guid("c60027eb-b622-4aa0-9096-6b285872aa30"),
+                            Id = new Guid("38ed5083-fcdb-497d-acba-73352e24415c"),
                             Description = "Coolermaster CK550",
                             Name = "Keyboard",
                             Price = 80.0m,
@@ -76,7 +73,7 @@ namespace InventoryService.Migrations
                         });
                 });
 
-            modelBuilder.Entity("InventoryService.Events.InventoryBaseEvent", b =>
+            modelBuilder.Entity("InventoryService.Events.ProductBaseEvent", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -87,31 +84,31 @@ namespace InventoryService.Migrations
                         .HasMaxLength(21)
                         .HasColumnType("nvarchar(21)");
 
-                    b.Property<string>("Product")
+                    b.Property<string>("ProductJson")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("InventoryEvents");
+                    b.ToTable("ProductEvents");
 
-                    b.HasDiscriminator<string>("EventType").HasValue("InventoryBaseEvent");
+                    b.HasDiscriminator<string>("EventType").HasValue("ProductBaseEvent");
 
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("InventoryService.Events.InventoryCreatedEvent", b =>
+            modelBuilder.Entity("InventoryService.Events.ProductCreateEvent", b =>
                 {
-                    b.HasBaseType("InventoryService.Events.InventoryBaseEvent");
+                    b.HasBaseType("InventoryService.Events.ProductBaseEvent");
 
-                    b.HasDiscriminator().HasValue("InventoryCreated");
+                    b.HasDiscriminator().HasValue("InventoryCreate");
                 });
 
-            modelBuilder.Entity("InventoryService.Events.InventoryRemoveEvent", b =>
+            modelBuilder.Entity("InventoryService.Events.ProductUpdateEvent", b =>
                 {
-                    b.HasBaseType("InventoryService.Events.InventoryBaseEvent");
+                    b.HasBaseType("InventoryService.Events.ProductBaseEvent");
 
-                    b.HasDiscriminator().HasValue("InventoryRemoved");
+                    b.HasDiscriminator().HasValue("InventoryUpdate");
                 });
 #pragma warning restore 612, 618
         }

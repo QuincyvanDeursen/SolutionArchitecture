@@ -22,18 +22,17 @@ namespace OrderService.Repository
 
         public async Task<Order> GetOrder(Guid id)
         {
-            return _context.Orders.Include(order => order.OrderItems).First(i => i.Id == id);
+            return await _context.Orders.Include(order => order.OrderItems).FirstAsync(i => i.Id == id);
         }
         public async Task<IEnumerable<Order>> GetAllOrdersAsync()
         {
             return await _context.Orders.Include(o => o.OrderItems).ToListAsync();
         }
 
-        public async Task<Order> SaveOrder(Order order)
+        public async Task CreateOrder(Order order)
         {
             var result = await _context.Orders.AddAsync(order);
             await _context.SaveChangesAsync();
-            return result.Entity;
         }
 
         public void UpdateOrder(Order order)

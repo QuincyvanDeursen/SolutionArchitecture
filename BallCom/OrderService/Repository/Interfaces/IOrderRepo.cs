@@ -1,5 +1,4 @@
 ﻿using OrderService.Domain;
-using OrderService.DTO;
 
 namespace OrderService.Repository.Interface
 {
@@ -7,7 +6,7 @@ namespace OrderService.Repository.Interface
     {
         Task<IEnumerable<Order>> GetAllOrdersAsync();
         Task<Order> GetOrder(Guid id);
-        Task<Order> SaveOrder(Order order);
+        Task CreateOrder(Order order);
         void UpdateOrder(Order order);
         void DeleteOrder(Order order);
     }
