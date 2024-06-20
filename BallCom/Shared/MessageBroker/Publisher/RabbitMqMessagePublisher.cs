@@ -1,5 +1,5 @@
 using System.Text;
-using Newtonsoft.Json;
+using System.Text.Json;
 using RabbitMQ.Client;
 using Shared.MessageBroker.Connection;
 using Shared.MessageBroker.Publisher.Interfaces;
@@ -38,15 +38,18 @@ public class RabbitMqMessagePublisher : IMessagePublisher
         return channel;
     }
     
-    public async Task PublishAsync<T>(T data, string topic)
+    public async Task PublishAsync(object dataObj, string topic)
     {
         var channel = await _channel.Value;
-        var messageBody = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new MessageEventData<T>()
+        var messageEventData = new MessageEventData()
         {
-            Data = data,
+            DataJson = JsonSerializer.Serialize(dataObj),
             Topic = topic
-        }));
+        };
         
+        Console.WriteLine($"[{messageEventData.Timestamp}] Sending message to bus (id -> {messageEventData.Id},topic -> {messageEventData.Topic})");
+        
+        var messageBody = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(messageEventData));
         await channel.BasicPublishAsync(exchange: _exchangeName, routingKey: topic, body: messageBody);
     }
 }

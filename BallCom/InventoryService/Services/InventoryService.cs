@@ -1,9 +1,9 @@
-﻿using InventoryService.Domain;
+﻿using System.Text.Json;
+using InventoryService.Domain;
 using InventoryService.Dto;
 using InventoryService.EventHandlers.Interfaces;
 using InventoryService.Events;
 using InventoryService.Services.Interfaces;
-using Newtonsoft.Json;
 using Shared.Repository.Interface;
 
 namespace InventoryService.Services
@@ -12,13 +12,11 @@ namespace InventoryService.Services
     {
         private readonly IReadRepository<Product> _productReadRepo;
         private readonly IInventoryEventHandler _inventoryEventHandler;
-        private readonly IWriteRepository<InventoryBaseEvent> _eventWriteRepo;
 
-        public InventoryService(IReadRepository<Product> productReadRepo, IInventoryEventHandler inventoryEventHandler, IWriteRepository<InventoryBaseEvent> eventWriteRepo)
+        public InventoryService(IReadRepository<Product> productReadRepo, IInventoryEventHandler inventoryEventHandler)
         {
             _productReadRepo = productReadRepo;
             _inventoryEventHandler = inventoryEventHandler;
-            _eventWriteRepo = eventWriteRepo;
         }
 
         public async Task<IEnumerable<Product>> GetAllProducts()
@@ -53,11 +51,10 @@ namespace InventoryService.Services
                 Price = productCreateDto.Price,
                 Description = productCreateDto.Description
             };
-
-            var productJson = JsonConvert.SerializeObject(product);
-            var inventoryEvent = new InventoryCreatedEvent(product, productJson);
-
-            await _eventWriteRepo.CreateAsync(inventoryEvent);
+            
+            var inventoryEvent = new InventoryCreatedEvent(product, JsonSerializer.Serialize(product));
+            
+            Console.WriteLine($"{inventoryEvent.Id} - {inventoryEvent.EventTimestamp} - {inventoryEvent.ProductJson}");
 
             // Save the event to seperate table in the database
             await _inventoryEventHandler.Handle(inventoryEvent);
@@ -80,7 +77,7 @@ namespace InventoryService.Services
                 Description = productUpdateDto.Description ?? oldProduct.Description
             };
 
-            var productJson = JsonConvert.SerializeObject(product);
+            var productJson = JsonSerializer.Serialize(product);
             var inventoryEvent = new InventoryUpdateEvent(oldProduct, productJson);
 
             // Save the event to seperate table in the database

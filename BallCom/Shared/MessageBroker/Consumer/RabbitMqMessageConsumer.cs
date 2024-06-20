@@ -42,7 +42,7 @@ public class RabbitMqMessageConsumer : IMessageConsumer
     }
 
 
-    public async Task ConsumeAsync<T>(Func<T, Task> onMessageReceived, IEnumerable<string> interestedTopics)
+    public async Task ConsumeAsync(Func<MessageEventData, Task> onMessageReceived, IEnumerable<string> interestedTopics)
     {
         var channel = await _channel.Value;
         
@@ -64,9 +64,11 @@ public class RabbitMqMessageConsumer : IMessageConsumer
         consumer.Received += async (sender, e) =>
         {
             var body = e.Body.ToArray();
-            var message = JsonSerializer.Deserialize<T>(Encoding.UTF8.GetString(body));
-            Console.WriteLine(Encoding.UTF8.GetString(body));
-            await onMessageReceived(message);
+            var eventData = JsonSerializer.Deserialize<MessageEventData>(Encoding.UTF8.GetString(body));
+            
+            Console.WriteLine($"[{eventData.Timestamp}] Received message from bus (id -> {eventData.Id},topic -> {eventData.Topic})");
+            
+            await onMessageReceived(eventData);
         };
         
         // Start consuming

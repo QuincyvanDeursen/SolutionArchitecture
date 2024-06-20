@@ -1,9 +1,11 @@
+using System.Text.Json;
+
 namespace Shared.MessageBroker;
 
-public class MessageEventData<T>
+public class MessageEventData()
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public DateTime Timestamp { get; set; } = DateTime.UtcNow;
     public string Topic { get; set; }
-    public T Data { get; set; }
+    public string DataJson { get; set; }
 }

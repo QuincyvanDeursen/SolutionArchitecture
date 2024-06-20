@@ -3,7 +3,6 @@ using InventoryService.Domain;
 using InventoryService.Dto;
 using InventoryService.Events;
 using InventoryService.Services.Interfaces;
-using Newtonsoft.Json;
 
 namespace InventoryService.Services
 {
@@ -18,6 +17,7 @@ namespace InventoryService.Services
         public async Task AddProduct(Product product)
         {
             await _context.Products.AddAsync(product);
+            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateProduct(Product product)
