@@ -16,7 +16,7 @@ namespace PaymentService.Services.RabbitMQ
         {
             await messageConsumer.ConsumeAsync(OnMessageReceived, new[]
             {
-            "order.create",
+                "order.create",
                 "order.update",
                 "customer.create",
                 "customer.update"
