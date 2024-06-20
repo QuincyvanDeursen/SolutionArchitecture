@@ -16,7 +16,7 @@ namespace PaymentService.Repository
              _context.Remove(orderItem);
         }
 
-        public Invoice GetInvoice(int id)
+        public Invoice GetInvoice(Guid id)
         {
             return _context.Invoices.First(i => i.Id == id);
         }

@@ -14,25 +14,23 @@ namespace OrderService.Controllers
     {
         private readonly ILogger<OrderController> _logger;
         private readonly IOrderService _orderService;
-        private readonly IOrderRepo _orderRepo;
 
-        public OrderController(ILogger<OrderController> logger, IOrderService orderService, IOrderRepo orderRepo)
+        public OrderController(ILogger<OrderController> logger, IOrderService orderService)
         { 
-            _orderRepo = orderRepo;
             _logger = logger;
             _orderService = orderService;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<OrderDTO>> Get()
+        public async Task<IEnumerable<Order>> Get()
         {
-            return await _orderRepo.GetAllOrdersAsync();
+            return await _orderService.GetAllOrders();
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Order> Get(int id)
+        public ActionResult<Order> Get(Guid id)
         {
-            var order = _orderRepo.GetOrder(id);
+            var order = _orderService.GetOrderById(id);
 
             if (order == null)
             {
@@ -43,7 +41,7 @@ namespace OrderService.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Order order)
+        public async Task<IActionResult> Post([FromBody] OrderCreateDto order)
         {
             try
             {
@@ -61,18 +59,6 @@ namespace OrderService.Controllers
                 _logger.LogError(ex, "Error processing order");
                 return StatusCode(500, "Internal server error");
             }
-        }
-
-        [HttpPut]
-        public void Put([FromBody] Order order)
-        {
-            _orderRepo.UpdateOrder(order);
-        }
-
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-            _orderRepo.DeleteOrder(_orderRepo.GetOrder(id));
         }
     }
 }
