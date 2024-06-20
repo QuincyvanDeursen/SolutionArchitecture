@@ -12,6 +12,8 @@ using Shared.MessageBroker.Publisher.Interfaces;
 using OrderService.Services;
 using OrderService.Services.Interface;
 using Shared.MessageBroker.Connection;
+using OrderService.EventHandlers.Interfaces;
+using OrderService.EventHandlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +23,9 @@ builder.Services.AddDbContext<OrderDbContext>(
     options => options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IOrderRepo, OrderRepo>();
 builder.Services.AddScoped<IOrderItemRepo, OrderItemRepo>();
+builder.Services.AddScoped<IOrderEventHandler, OrderEventHandler>();
+builder.Services.AddScoped<IOrderService, OrderService.Services.OrderService>();
+builder.Services.AddScoped<IInventoryServiceClient, InventoryServiceClient>();
 
 // Add RabbitMQ Publisher and Consumer services.
 var exchangeName = builder.Configuration.GetValue<string>("RabbitMQ:ExchangeName");
@@ -33,8 +38,6 @@ builder.Services.AddSingleton<IMessageConsumer>(x => new RabbitMqMessageConsumer
 // Add a hosted service for listening to RabbitMQ messages (consumer).
 builder.Services.AddHostedService<OrderMessageListenerService>();
 
-builder.Services.AddScoped<IOrderService, OrderService.Services.RabbitMQ.OrderService>();
-builder.Services.AddScoped<IInventoryServiceClient, InventoryServiceClient>();
 builder.Services.AddControllers();
 
 builder.Services.AddHttpClient();

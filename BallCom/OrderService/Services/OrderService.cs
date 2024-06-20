@@ -4,16 +4,15 @@ using OrderService.EventHandlers.Interfaces;
 using OrderService.Events;
 using OrderService.Repository.Interface;
 using OrderService.Services.Interface;
-using System.Text.Json;
+using Shared.MessageBroker.Publisher.Interfaces;
 
-namespace OrderService.Services.RabbitMQ
+namespace OrderService.Services
 {
     public class OrderService : IOrderService
     {
         private readonly IInventoryServiceClient _inventoryServiceClient;
         private readonly IOrderRepo _orderRepo;
         private readonly IOrderEventHandler _orderEventHandler;
-
 
         public OrderService(IInventoryServiceClient inventoryServiceClient, IOrderRepo orderRepo, IOrderEventHandler orderEventHandler)
         {
@@ -26,24 +25,22 @@ namespace OrderService.Services.RabbitMQ
         {
             if (IsOrderWithinProductLimit(orderCreateDto.OrderItems) && await CheckStock(orderCreateDto.OrderItems))
             {
-                var OrderId = Guid.NewGuid();
-                var orderItems = ConvertToOrderItem(orderCreateDto.OrderItems, OrderId);
+                var Id = Guid.NewGuid();
+                var orderItems = ConvertToOrderItem(orderCreateDto.OrderItems, Id);
                 var order = new Order
                 {
-                    Id = OrderId,
+                    Id = Id,
                     OrderDate = DateTime.Now,
                     CustomerId = orderCreateDto.CustomerId,
                     Address = orderCreateDto.Address,
                     OrderItems = orderItems,
-                    Totalprice = calculateTotalPrice(orderItems)
                 };
 
                 //Order opslaan
                 await _orderRepo.SaveOrder(order);
 
-                //Order created event
-                OrderCreatedEvent orderCreatedEvent = new OrderCreatedEvent(order);
-                await _orderEventHandler.Handle(orderCreatedEvent);
+                var OrderCreatedEvent = new OrderCreatedEvent(order);
+                await _orderEventHandler.Handle(OrderCreatedEvent);
 
                 return true;
             }
@@ -51,15 +48,17 @@ namespace OrderService.Services.RabbitMQ
         }
         private async Task<bool> CheckStock(ICollection<OrderItemCreateDto> orderItems)
         {
-            foreach (var orderItem in orderItems)
+            var products = new List<ProductStockDto>();
+            foreach (var item in orderItems)
             {
-                var product = await _inventoryServiceClient.GetInventoryAsync(orderItem.ProductId);
-                if (product.Quantity < orderItem.Quantity)
+                ProductStockDto product = new ProductStockDto
                 {
-                    throw new Exception($"Not enough inventory for product {orderItem.ProductId}");
-                }
+                    ProductId = item.ProductId,
+                    Quantity = item.Quantity
+                };
+                products.Add(product);
             }
-            return true;
+            return await _inventoryServiceClient.GetInventoryAsync(products);
         }
 
         private bool IsOrderWithinProductLimit(ICollection<OrderItemCreateDto> orderItems)
@@ -85,19 +84,8 @@ namespace OrderService.Services.RabbitMQ
                     ProductPrice = item.ProductPrice,
                     Quantity = item.Quantity
                 };
-                orderItems.Add(orderItem);
             }
             return orderItems;
-        }
-
-        private decimal calculateTotalPrice(ICollection<OrderItem> orderItems)
-        {
-            decimal totalPrice = 0;
-            foreach (var item in orderItems)
-            {
-                totalPrice += item.ProductPrice;
-            }
-            return totalPrice;
         }
 
         public async Task<Order> GetOrderById(Guid id)

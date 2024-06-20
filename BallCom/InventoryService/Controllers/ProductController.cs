@@ -88,7 +88,7 @@ namespace InventoryService.Controllers
             }
         }
 
-        [HttpPost("/checkstock")]
+        [HttpPost("checkstock")]
         public async Task<ActionResult> CheckStock([FromBody] List<ProductStockDto> productsFromOrder)
         {
             try

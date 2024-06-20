@@ -22,11 +22,6 @@ namespace InventoryService.Services
             _logger = logger;
         }
 
-
-
-
-
-
         // This method is used to get all products from the  read database
         public async Task<IEnumerable<Product>> GetAllProducts()
         {
@@ -38,7 +33,6 @@ namespace InventoryService.Services
 
             return products;
         }
-
 
         // This method is used to get a product by its id from the read database
         public async Task<Product> GetProduct(Guid id)
@@ -111,7 +105,7 @@ namespace InventoryService.Services
                 if (productInDb.Quantity < product.Quantity)
                 {
                     _logger.LogInformation($"Product with id {product.ProductId} has insufficient stock");
-                    throw new Exception("Product with id {product.ProductId} has insufficient stock");
+                    return false;
                 }
             }
             return true;

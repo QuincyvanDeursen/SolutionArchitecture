@@ -18,7 +18,8 @@ public class ProductMessageListenerService(IMessageConsumer messageConsumer, ISe
         await messageConsumer.ConsumeAsync(OnMessageReceived, new []
         {
             "inventory.create",
-            "inventory.update"
+            "inventory.update",
+            "order.create"
         });
     }
 
