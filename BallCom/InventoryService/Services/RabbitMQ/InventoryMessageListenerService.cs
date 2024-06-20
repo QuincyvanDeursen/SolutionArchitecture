@@ -2,9 +2,12 @@
 
 using InventoryService.Domain;
 using InventoryService.Dto;
+using InventoryService.EventHandlers.Interfaces;
+using InventoryService.Events;
 using InventoryService.Services.Interfaces;
 using Shared.MessageBroker;
 using Shared.MessageBroker.Consumer.Interfaces;
+using Shared.Repository.Interface;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace InventoryService.Services.RabbitMQ;
@@ -27,18 +30,19 @@ public class InventoryMessageListenerService(IMessageConsumer messageConsumer, I
     {
         // Create a new scope for the event handler service (scoped service)
         using var scope = _serviceProvider.CreateScope();
-        var eventHandlerService = scope.ServiceProvider.GetService<IEventHandlerService>() ??
-                                  throw new ArgumentNullException(nameof(IEventHandlerService));
+        var eventHandlerService = scope.ServiceProvider.GetRequiredService<IEventHandlerService>();  
         
         switch (data.Topic)
         {
             case "inventory.create":
                 var createProduct = JsonSerializer.Deserialize<Product>(data.DataJson);
-                await eventHandlerService.AddProduct(createProduct);
+
+                await eventHandlerService.ProcessProductCreatedEvent(createProduct);
                 break;
             case "inventory.update":
                 var updateProduct = JsonSerializer.Deserialize<Product>(data.DataJson);
-                await eventHandlerService.AddProduct(updateProduct);
+                
+                await eventHandlerService.ProcessProductUpdatedEvent(updateProduct);
                 break;
             default:
                 throw new ArgumentException(data.Topic + " is not a subscribed topic.");

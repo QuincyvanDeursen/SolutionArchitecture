@@ -26,10 +26,11 @@ var connectionString = builder.Configuration.GetConnectionString("Default");
 builder.Services.AddDbContext<InventoryDbContext>(
     options => options.UseSqlServer(connectionString));
 
-builder.Services.AddScoped<IWriteRepository<InventoryBaseEvent>, InventoryWriteRepo>();
+builder.Services.AddScoped<IWriteRepository<InventoryBaseEvent>, EventWriteRepo>();
 builder.Services.AddScoped<IReadRepository<Product>, InventoryReadRepo>();
 builder.Services.AddScoped<IInventoryEventHandler, InventoryEventHandler>();
 builder.Services.AddScoped<IInventoryService, InventoryService.Services.InventoryService>();
+builder.Services.AddScoped<IWriteRepository<Product>, ProductWriteRepo>();
 builder.Services.AddScoped<IEventHandlerService, EventHandlerService>();
 
 // Add RabbitMQ Publisher and Consumer services.
