@@ -12,5 +12,7 @@ namespace OrderService.Domain
         public string? Address {  get; set; }
         public ICollection<OrderItem>? OrderItems { get; set; }
         public decimal Totalprice { get; set; } = 0;
+        public OrderStatus OrderStatus { get; set; }
+
     }
 }

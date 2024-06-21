@@ -7,7 +7,6 @@ namespace OrderService.Repository.Interface
         Task<IEnumerable<Order>> GetAllOrdersAsync();
         Task<Order> GetOrder(Guid id);
         Task CreateOrder(Order order);
-        void UpdateOrder(Order order);
-        void DeleteOrder(Order order);
+        Task UpdateOrder(Order order);
     }
 }

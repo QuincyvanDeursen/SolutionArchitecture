@@ -101,5 +101,31 @@ namespace OrderService.Services
         {
             return await _orderRepo.GetAllOrdersAsync();
         }
+
+        public async Task UpdateOrder(Guid id, OrderUpdateDto order)
+        {
+            var existingOrder = await _orderRepo.GetOrder(id);
+            if (existingOrder == null)
+            {
+                throw new KeyNotFoundException($"Order with ID {id} not found.");
+            }
+
+            existingOrder.Address = order.Address;
+
+            await _orderRepo.UpdateOrder(existingOrder);
+        }
+
+        public async Task UpdateOrderStatus(Guid id, OrderStatusUpdateDto order)
+        {
+            var existingOrder = await _orderRepo.GetOrder(id);
+            if (existingOrder == null)
+            {
+                throw new KeyNotFoundException($"Order with ID {id} not found.");
+            }
+
+            existingOrder.OrderStatus = order.OrderStatus;
+
+            await _orderRepo.UpdateOrder(existingOrder);
+        }
     }
 }

@@ -8,8 +8,8 @@ namespace OrderService.Repository
 {
     public class OrderRepo : IOrderRepo
     {
-        private readonly OrderDbContext _context;
-        public OrderRepo(OrderDbContext context)
+        private readonly AppDbContext _context;
+        public OrderRepo(AppDbContext context)
         {
             _context = context;
         }
@@ -35,9 +35,10 @@ namespace OrderService.Repository
             await _context.SaveChangesAsync();
         }
 
-        public void UpdateOrder(Order order)
+        public async Task UpdateOrder(Order order)
         {
             _context.Orders.Update(order);
+            await _context.SaveChangesAsync();
         }
     }
 }

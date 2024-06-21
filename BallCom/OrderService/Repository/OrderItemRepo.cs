@@ -7,9 +7,9 @@ namespace OrderService.Repository
 {
     public class OrderItemRepo : IOrderItemRepo
     {
-        private readonly OrderDbContext _context;
+        private readonly AppDbContext _context;
 
-        public OrderItemRepo(OrderDbContext context) { 
+        public OrderItemRepo(AppDbContext context) { 
             _context = context;
         }
         public void DeleteOrderItem(OrderItem orderItem)

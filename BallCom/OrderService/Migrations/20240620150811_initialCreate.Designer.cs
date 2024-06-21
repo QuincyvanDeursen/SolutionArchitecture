@@ -11,7 +11,7 @@ using OrderService.Database;
 
 namespace OrderService.Migrations
 {
-    [DbContext(typeof(OrderDbContext))]
+    [DbContext(typeof(AppDbContext))]
     [Migration("20240620150811_initialCreate")]
     partial class initialCreate
     {

@@ -51,5 +51,35 @@ namespace OrderService.Controllers
                 return BadRequest("Error processing order, certain items might be out of stock");
             }
         }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Put(Guid id, [FromBody] OrderUpdateDto order)
+        {
+            try
+            {
+                await _orderService.UpdateOrder(id, order);
+                return Ok("Order updated successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating order");
+                return BadRequest("Error updating order");
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateOrderStatus(Guid id, [FromBody] OrderStatusUpdateDto order)
+        {
+            try
+            {
+                await _orderService.UpdateOrderStatus(id, order);
+                return Ok("Order updated successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating order");
+                return BadRequest("Error updating order");
+            }
+        }
     }
 }

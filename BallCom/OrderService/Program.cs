@@ -19,7 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("Default");
-builder.Services.AddDbContext<OrderDbContext>(
+builder.Services.AddDbContext<AppDbContext>(
     options => options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IOrderRepo, OrderRepo>();
 builder.Services.AddScoped<IOrderItemRepo, OrderItemRepo>();
@@ -50,7 +50,7 @@ builder.Services.AddSwaggerGen();
 if (builder.Environment.IsProduction())
 {
     using var scope = builder.Services.BuildServiceProvider().CreateScope();
-    var dbContext = scope.ServiceProvider.GetRequiredService<OrderDbContext>();
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     dbContext.Database.Migrate();
 }
 
