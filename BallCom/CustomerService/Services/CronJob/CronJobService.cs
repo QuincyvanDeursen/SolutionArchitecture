@@ -1,10 +1,7 @@
-﻿using CustomerService.Domain;
-using System;
-using System.Text.Json;
-using CustomerService.Repository.Interfaces;
+﻿using CustomerService.Dto;
 using CustomerService.Services.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
 using Shared.MessageBroker.Publisher.Interfaces;
+using System.Text.Json;
 
 namespace CustomerService.Services.CronJob
 {
@@ -48,7 +45,7 @@ namespace CustomerService.Services.CronJob
 
             _logger.LogInformation($"Received customers with status code: {response.StatusCode}");
 
-            var newCustomers = new List<Customer>();
+            var newCustomers = new List<CustomerCreateDto>();
             var content = await response.Content.ReadAsStreamAsync();
 
             using var reader = new StreamReader(content);
@@ -58,9 +55,8 @@ namespace CustomerService.Services.CronJob
                 if (line == null) continue;
 
                 var values = line.Split(',');
-                newCustomers.Add(new Customer
+                newCustomers.Add(new CustomerCreateDto
                 {
-                    Id = Guid.NewGuid(),
                     FirstName = values[1],
                     LastName = values[2],
                     PhoneNumber = values[3],
@@ -70,11 +66,11 @@ namespace CustomerService.Services.CronJob
             }
 
             using var scope = host.Services.CreateScope();
-            var customerService = scope.ServiceProvider.GetRequiredService<ICustomerRepo>();
+            var customerService = scope.ServiceProvider.GetRequiredService<ICustomerService>();
             var messageBroker = scope.ServiceProvider.GetRequiredService<IMessagePublisher>();
 
             // Save the customers to the database
-            var oldCustomers = await customerService.GetAllCustomers();
+            var oldCustomers = await customerService.GetAll();
 
             // Check if the customer already exists in the database
             var count = 0;
@@ -88,10 +84,9 @@ namespace CustomerService.Services.CronJob
                 count++;
 
                 // Save new customer to the database
-                await customerService.AddCustomer(customer);
+                await customerService.Create(customer);
 
-                // Publish the event to the message broker
-                await messageBroker.PublishAsync(JsonSerializer.Serialize(customer), "customer.create");
+         
             }
 
             _logger.LogInformation($"Added {count} new customers to the database.");   

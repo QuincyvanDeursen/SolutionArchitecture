@@ -50,7 +50,7 @@ namespace CustomerService.Controllers
         {
             try
             {
-                await _customerService.Add(customer);
+                await _customerService.Create(customer);
                 return Ok();
             } catch(Exception e)
             {

@@ -8,7 +8,7 @@ namespace CustomerService.Services.Interfaces
 
         Task<IEnumerable<Customer>> GetAll();
         Task<Customer> Get(Guid id);
-        Task Add(CustomerCreateDto customer);
+        Task Create(CustomerCreateDto customer);
         Task Update(Guid id, CustomerUpdateDto customer);
         Task Delete(Guid id);
     }
