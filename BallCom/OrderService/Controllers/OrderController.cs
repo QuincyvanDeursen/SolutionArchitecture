@@ -67,7 +67,7 @@ namespace OrderService.Controllers
             }
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id}/status")]
         public async Task<ActionResult> UpdateOrderStatus(Guid id, [FromBody] OrderStatusUpdateDto order)
         {
             try
