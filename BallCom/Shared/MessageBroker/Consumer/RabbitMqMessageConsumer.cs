@@ -66,7 +66,7 @@ public class RabbitMqMessageConsumer : IMessageConsumer
             var body = e.Body.ToArray();
             var eventData = JsonSerializer.Deserialize<MessageEventData>(Encoding.UTF8.GetString(body));
             
-            Console.WriteLine($"[{eventData.Timestamp}] Received message from bus (id -> {eventData.Id},topic -> {eventData.Topic})");
+            Console.WriteLine($"[{eventData.EventTimestamp}] Received message from bus (id -> {eventData.Id},topic -> {eventData.Topic})");
             
             await onMessageReceived(eventData);
         };

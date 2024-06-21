@@ -47,7 +47,7 @@ public class RabbitMqMessagePublisher : IMessagePublisher
             Topic = topic
         };
         
-        Console.WriteLine($"[{messageEventData.Timestamp}] Sending message to bus (id -> {messageEventData.Id},topic -> {messageEventData.Topic})");
+        Console.WriteLine($"[{messageEventData.EventTimestamp}] Sending message to bus (id -> {messageEventData.Id},topic -> {messageEventData.Topic})");
         
         var messageBody = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(messageEventData));
         await channel.BasicPublishAsync(exchange: _exchangeName, routingKey: topic, body: messageBody);
