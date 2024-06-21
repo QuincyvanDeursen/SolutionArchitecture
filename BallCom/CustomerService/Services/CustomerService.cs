@@ -2,24 +2,16 @@
 using CustomerService.Dto;
 using CustomerService.Repository.Interfaces;
 using CustomerService.Services.Interfaces;
+using Shared.MessageBroker.Publisher.Interfaces;
 
 namespace CustomerService.Services
 {
-    public class CustomerService : ICustomerService
+    public class CustomerService(ICustomerRepo customerRepo, IMessagePublisher messagePublisher)
+        : ICustomerService
     {
-
-        private readonly ICustomerRepo _customerRepo;
-
-        public CustomerService(ICustomerRepo customerRepo)
-        {
-            _customerRepo = customerRepo;
-        }
-
-
-
         public async Task<Customer> Get(Guid id)
         {
-            var customer = await _customerRepo.GetCustomer(id);
+            var customer = await customerRepo.GetCustomer(id);
             if (customer == null)
             {
                 throw new KeyNotFoundException($"Customer with ID {id} not found.");
@@ -30,7 +22,7 @@ namespace CustomerService.Services
 
         public async Task<IEnumerable<Customer>> GetAll()
         {
-            var customers = await _customerRepo.GetAllCustomers();
+            var customers = await customerRepo.GetAllCustomers();
             if (customers == null || !customers.Any())
             {
                 throw new KeyNotFoundException("No customers found.");
@@ -40,7 +32,7 @@ namespace CustomerService.Services
 
         public async Task Delete(Guid id)
         {
-            await _customerRepo.DeleteCustomer(id);
+            await customerRepo.DeleteCustomer(id);
         }
 
         public async Task Add(CustomerCreateDto customerCreateDto)
@@ -55,13 +47,15 @@ namespace CustomerService.Services
                 Address = customerCreateDto.Address
             };
 
-            await _customerRepo.AddCustomer(customer);
-
+            await customerRepo.AddCustomer(customer);
+            
+            // Send event to RabbitMQ
+            await messagePublisher.PublishAsync(customer, "customer.create");
         }
 
         public async Task Update(Guid id, CustomerUpdateDto customer)
         {
-            var existingCustomer = await _customerRepo.GetCustomer(id);
+            var existingCustomer = await customerRepo.GetCustomer(id);
             if (existingCustomer == null)
             {
                 throw new KeyNotFoundException($"Customer with ID {id} not found.");
@@ -72,7 +66,10 @@ namespace CustomerService.Services
             existingCustomer.PhoneNumber = customer.PhoneNumber ?? existingCustomer.PhoneNumber;
             existingCustomer.CompanyName = customer.CompanyName ?? existingCustomer.CompanyName;
 
-            await _customerRepo.UpdateCustomer(existingCustomer);
+            await customerRepo.UpdateCustomer(existingCustomer);
+            
+            // Send event to RabbitMQ
+            await messagePublisher.PublishAsync(existingCustomer, "customer.update");
         }
     }
 }
