@@ -6,22 +6,22 @@ namespace InventoryService.Repository
 {   
 
     // This class is responsible for saving and deleting events in the database (Event sourcing)
-    public class EventWriteRepo : IWriteRepository<InventoryBaseEvent>
+    public class ProductEventWriteRepo : IWriteRepository<ProductBaseEvent>
     {
-        private readonly InventoryDbContext _context;
+        private readonly AppDbContext _context;
 
-        public EventWriteRepo(InventoryDbContext context)
+        public ProductEventWriteRepo(AppDbContext context)
         {
             _context = context;
         }
 
-        public async Task CreateAsync(InventoryBaseEvent entity)
+        public async Task CreateAsync(ProductBaseEvent entity)
         {
-            await _context.InventoryEvents.AddAsync(entity);
+            await _context.ProductEvents.AddAsync(entity);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(InventoryBaseEvent entity)
+        public async Task UpdateAsync(ProductBaseEvent entity)
         {
             var product = entity.Product;
             _context.Products.Update(product);

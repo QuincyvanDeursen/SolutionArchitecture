@@ -1,18 +1,14 @@
 
 
 using InventoryService.Domain;
-using InventoryService.Dto;
-using InventoryService.EventHandlers.Interfaces;
-using InventoryService.Events;
 using InventoryService.Services.Interfaces;
 using Shared.MessageBroker;
 using Shared.MessageBroker.Consumer.Interfaces;
-using Shared.Repository.Interface;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace InventoryService.Services.RabbitMQ;
 
-public class InventoryMessageListenerService(IMessageConsumer messageConsumer, IServiceProvider serviceProvider) : IHostedService
+public class ProductMessageListenerService(IMessageConsumer messageConsumer, IServiceProvider serviceProvider) : IHostedService
 {
     private readonly IMessageConsumer _messageConsumer = messageConsumer;
     private readonly IServiceProvider _serviceProvider = serviceProvider;

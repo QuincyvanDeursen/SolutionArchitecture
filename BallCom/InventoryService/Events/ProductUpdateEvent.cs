@@ -3,20 +3,19 @@ using InventoryService.EventHandlers.Interfaces;
 
 namespace InventoryService.Events
 {
-    public class InventoryCreatedEvent : InventoryBaseEvent
+    public class ProductUpdateEvent : ProductBaseEvent
     {
-        public InventoryCreatedEvent()
+        public ProductUpdateEvent()
         {
             // Parameterless constructor required by EF Core
         }
 
-        public InventoryCreatedEvent(Product product, string productJson)
+        public ProductUpdateEvent(Product product, string productJson)
         {
             Product = product;
             ProductJson = productJson;
         }
-
-        public override void Accept(IInventoryEventHandler @event)
+        public override void Accept(IProductEventHandler @event)
         {
             @event.Handle(this);
         }

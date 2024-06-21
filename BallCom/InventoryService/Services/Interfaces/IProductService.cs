@@ -4,11 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryService.Services.Interfaces
 {
-    public interface IInventoryService
+    public interface IProductService
     {
         Task<IEnumerable<Product>> GetAllProducts();
         Task<Product> GetProduct(Guid id);
-        Task CreateEvent(ProductCreateDto productCreateDto);
-        Task CreateUpdateEvent(Guid id, ProductUpdateDto productUpdateDto);
+        Task SendCreateEvent(ProductCreateDto productCreateDto);
+        Task SendUpdateEvent(Guid id, ProductUpdateDto productUpdateDto);
+        Task<bool> CheckStock (List<ProductStockDto> productsToCheck);
     }
 }
