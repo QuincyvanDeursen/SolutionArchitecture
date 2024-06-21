@@ -15,4 +15,8 @@
     <PackageReference Include="RabbitMQ.Client" Version="7.0.0-rc.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="MessageBroker\Event\" />
+  </ItemGroup>
+
 </Project>

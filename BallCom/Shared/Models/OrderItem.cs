@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PaymentService.Domain
+namespace Shared.Models
 {
     public class OrderItem
     {
@@ -11,7 +11,6 @@ namespace PaymentService.Domain
         public string ProductName { get; set; }
         public decimal ProductPrice { get; set; }
         public int Quantity { get; set; }
-        public Order Order { get; set; }
-
+        public Order Order { get; set; } 
     }
 }
