@@ -1,6 +1,6 @@
 ﻿using OrderService.Domain;
 using OrderService.EventHandlers.Interfaces;
-using Shared.EventSourcing;
+using Shared.Event;
 
 namespace OrderService.Events
 {

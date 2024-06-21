@@ -1,5 +1,4 @@
 ﻿using InventoryService.Events;
-using Shared.EventSourcing;
 
 namespace InventoryService.EventHandlers.Interfaces
 {

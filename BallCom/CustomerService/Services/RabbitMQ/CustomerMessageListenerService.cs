@@ -11,7 +11,6 @@ public class CustomerMessageListenerService(IMessageConsumer messageConsumer) : 
     {
         await messageConsumer.ConsumeAsync(OnMessageReceived, new []
         {
-            "customer.*",
             "order.*" // TODO: remove this line (testing)
         });
     }
@@ -19,7 +18,7 @@ public class CustomerMessageListenerService(IMessageConsumer messageConsumer) : 
     public async Task OnMessageReceived(MessageEventData data)
     {
         // TODO: Based on the topic, do the appropriate action
-        Console.WriteLine($"[{data.Timestamp}] Received message: ({data.Topic} - {data.Id})");
+        //Console.WriteLine($"[{data.Timestamp}] Received message: ({data.Topic} - {data.Id})");
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

@@ -19,7 +19,7 @@ public class OrderMessageListenerService(IMessageConsumer messageConsumer) : IHo
     public async Task OnMessageReceived(MessageEventData data)
     {
         // TODO: Based on the topic, do the appropriate action
-        Console.WriteLine($"[{data.Timestamp}] Received message: ({data.Topic} - {data.Id})");
+        //Console.WriteLine($"[{data.Timestamp}] Received message: ({data.Topic} - {data.Id})");
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

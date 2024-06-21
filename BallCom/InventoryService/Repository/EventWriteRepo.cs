@@ -1,6 +1,5 @@
 ﻿using InventoryService.Database;
 using InventoryService.Events;
-using Shared.EventSourcing;
 using Shared.Repository.Interface;
 
 namespace InventoryService.Repository
