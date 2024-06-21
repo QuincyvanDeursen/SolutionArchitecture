@@ -4,6 +4,7 @@ using InventoryService.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InventoryService.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class InventoryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240621075744_initialCreate")]
+    partial class initialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,7 +52,7 @@ namespace InventoryService.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("ff7d052d-92e1-4a75-92e7-60691de7757d"),
+                            Id = new Guid("63e69ab1-ca66-4c28-aaaa-aa65dd03b172"),
                             Description = "HP Envy 16x",
                             Name = "Laptop",
                             Price = 799.0m,
@@ -57,7 +60,7 @@ namespace InventoryService.Migrations
                         },
                         new
                         {
-                            Id = new Guid("3cc09248-d064-4bf8-bcb6-142283f0d185"),
+                            Id = new Guid("08f4e435-02f1-44b9-8164-f81c94abe821"),
                             Description = "Logitech MX Master",
                             Name = "Mouse",
                             Price = 40.0m,
@@ -65,7 +68,7 @@ namespace InventoryService.Migrations
                         },
                         new
                         {
-                            Id = new Guid("f7db078e-66b8-4c86-9af3-a3c4e03f12e1"),
+                            Id = new Guid("b143a6ef-ec40-4875-8e60-c4f33ca35a53"),
                             Description = "Coolermaster CK550",
                             Name = "Keyboard",
                             Price = 80.0m,
@@ -73,7 +76,7 @@ namespace InventoryService.Migrations
                         });
                 });
 
-            modelBuilder.Entity("InventoryService.Events.InventoryBaseEvent", b =>
+            modelBuilder.Entity("InventoryService.Events.ProductBaseEvent", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -90,23 +93,23 @@ namespace InventoryService.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("InventoryEvents");
+                    b.ToTable("ProductEvents");
 
-                    b.HasDiscriminator<string>("EventType").HasValue("InventoryBaseEvent");
+                    b.HasDiscriminator<string>("EventType").HasValue("ProductBaseEvent");
 
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("InventoryService.Events.InventoryCreatedEvent", b =>
+            modelBuilder.Entity("InventoryService.Events.ProductCreateEvent", b =>
                 {
-                    b.HasBaseType("InventoryService.Events.InventoryBaseEvent");
+                    b.HasBaseType("InventoryService.Events.ProductBaseEvent");
 
                     b.HasDiscriminator().HasValue("InventoryCreate");
                 });
 
-            modelBuilder.Entity("InventoryService.Events.InventoryUpdateEvent", b =>
+            modelBuilder.Entity("InventoryService.Events.ProductUpdateEvent", b =>
                 {
-                    b.HasBaseType("InventoryService.Events.InventoryBaseEvent");
+                    b.HasBaseType("InventoryService.Events.ProductBaseEvent");
 
                     b.HasDiscriminator().HasValue("InventoryUpdate");
                 });
