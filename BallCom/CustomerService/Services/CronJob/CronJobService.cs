@@ -1,18 +1,25 @@
-﻿using CustomerService.Domain;
-using System;
-using System.Text.Json;
-using CustomerService.Repository.Interfaces;
+﻿using CustomerService.Dto;
 using CustomerService.Services.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
 using Shared.MessageBroker.Publisher.Interfaces;
+using System.Text.Json;
 
 namespace CustomerService.Services.CronJob
 {
-    public class CronJobService(HttpClient client, ILogger<CronJobService> logger, IHost host, Timer timer)
-        : IHostedService, IDisposable
+    public class CronJobService : IHostedService, IDisposable
     {
         private readonly string Url =
             "https://marcavans.blob.core.windows.net/solarch/fake_customer_data_export.csv?sv=2023-01-03&st=2024-06-14T10%3A31%3A07Z&se=2032-06-15T10%3A31%3A00Z&sr=b&sp=r&sig=q4Ie3kKpguMakW6sbcKl0KAWutzpMi747O4yIr8lQLI%3D";
+        private readonly HttpClient client;
+        private readonly ILogger<CronJobService> _logger;
+        private readonly IHost host;
+        Timer? timer;
+
+        public CronJobService(HttpClient client, ILogger<CronJobService> logger, IHost host)
+        {
+            this.client = client;
+            this._logger = logger;
+            this.host = host;
+        }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
@@ -32,12 +39,13 @@ namespace CustomerService.Services.CronJob
             var response = await client.GetAsync(Url);
             if (!response.IsSuccessStatusCode)
             {
+                _logger.LogError($"Failed to retrieve customer data with status code: {response.StatusCode}");
                 throw new Exception("Failed to retrieve customer data.");
             }
 
-            logger.LogInformation($"Received customers with status code: {response.StatusCode}");
+            _logger.LogInformation($"Received customers with status code: {response.StatusCode}");
 
-            var newCustomers = new List<Customer>();
+            var newCustomers = new List<CustomerCreateDto>();
             var content = await response.Content.ReadAsStreamAsync();
 
             using var reader = new StreamReader(content);
@@ -47,23 +55,22 @@ namespace CustomerService.Services.CronJob
                 if (line == null) continue;
 
                 var values = line.Split(',');
-                newCustomers.Add(new Customer
+                newCustomers.Add(new CustomerCreateDto
                 {
-                    Id = Guid.NewGuid(),
-                    FirstName = values[0],
-                    LastName = values[1],
-                    PhoneNumber = values[2],
-                    CompanyName = values[3],
+                    FirstName = values[1],
+                    LastName = values[2],
+                    PhoneNumber = values[3],
+                    CompanyName = values[0],
                     Address = values[4]
                 });
             }
 
             using var scope = host.Services.CreateScope();
-            var customerService = scope.ServiceProvider.GetRequiredService<ICustomerRepo>();
+            var customerService = scope.ServiceProvider.GetRequiredService<ICustomerService>();
             var messageBroker = scope.ServiceProvider.GetRequiredService<IMessagePublisher>();
 
             // Save the customers to the database
-            var oldCustomers = await customerService.GetAllCustomers();
+            var oldCustomers = await customerService.GetAll();
 
             // Check if the customer already exists in the database
             var count = 0;
@@ -77,20 +84,17 @@ namespace CustomerService.Services.CronJob
                 count++;
 
                 // Save new customer to the database
-                await customerService.AddCustomer(customer);
+                await customerService.Create(customer);
 
-                // Publish the event to the message broker
-                await messageBroker.PublishAsync(JsonSerializer.Serialize(customer), "customer.create");
+         
             }
 
-            logger.LogInformation($"Added {count} new customers to the database.");
-
-            
+            _logger.LogInformation($"Added {count} new customers to the database.");   
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            // Stop the timer when the application is shutting down
+            if (timer == null) return Task.CompletedTask;
             timer.Change(Timeout.Infinite, 0);
 
             return Task.CompletedTask;
@@ -98,7 +102,7 @@ namespace CustomerService.Services.CronJob
 
         public void Dispose()
         {
-            // Dispose of the timer object
+            if (timer == null) return;
             timer.Dispose();
         }
     }
