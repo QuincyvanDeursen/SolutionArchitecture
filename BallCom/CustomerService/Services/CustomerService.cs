@@ -43,7 +43,7 @@ namespace CustomerService.Services
             await _customerRepo.DeleteCustomer(id);
         }
 
-        public async Task Add(CustomerCreateDto customerCreateDto)
+        public async Task Create(CustomerCreateDto customerCreateDto)
         {
             var customer = new Customer
             {
