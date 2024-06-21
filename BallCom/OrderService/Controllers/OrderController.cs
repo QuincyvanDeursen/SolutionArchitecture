@@ -1,10 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OrderService.Domain;
 using OrderService.DTO;
-using OrderService.Repository.Interface;
-using OrderService.Services;
 using OrderService.Services.Interface;
-using System.Security.Cryptography;
 
 namespace OrderService.Controllers
 {
@@ -41,23 +38,47 @@ namespace OrderService.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] OrderCreateDto order)
+        public async Task<ActionResult> Post([FromBody] OrderCreateDto order)
         {
             try
             {
-                if (await _orderService.CreateOrder(order))
-                {
-                    return Ok("Order saved successfully");
-                }
-                else
-                {
-                    return BadRequest("One or more products are not in stock");
-                }
+                await _orderService.CreateOrder(order);
+                return Ok("Order saved successfully");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing order");
-                return StatusCode(500, "Internal server error");
+                return BadRequest("Error processing order, certain items might be out of stock");
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Put(Guid id, [FromBody] OrderUpdateDto order)
+        {
+            try
+            {
+                await _orderService.UpdateOrder(id, order);
+                return Ok("Order updated successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating order");
+                return BadRequest("Error updating order");
+            }
+        }
+
+        [HttpPut("{id}/status")]
+        public async Task<ActionResult> UpdateOrderStatus(Guid id, [FromBody] OrderStatusUpdateDto order)
+        {
+            try
+            {
+                await _orderService.UpdateOrderStatus(id, order);
+                return Ok("Order updated successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating order");
+                return BadRequest("Error updating order");
             }
         }
     }
