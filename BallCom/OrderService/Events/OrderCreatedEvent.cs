@@ -10,10 +10,9 @@ namespace OrderService.Events
             // Parameterless constructor required by EF Core
         }
 
-        public OrderCreatedEvent(Order order, string productJson)
+        public OrderCreatedEvent(Order order)
         {
             Order = order;
-            OrderJson = productJson;
         }
         public override void Accept(IOrderEventHandler @event)
         {

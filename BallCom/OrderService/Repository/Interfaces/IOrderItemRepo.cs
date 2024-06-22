@@ -4,11 +4,10 @@ namespace OrderService.Repository.Interface
 {
     public interface IOrderItemRepo
     {
-            IEnumerable<OrderItem> GetOrderItems();
-
+            Task <IEnumerable<OrderItem>> GetOrderItems();
             IEnumerable<OrderItem> GetOrderItemsByOrderId(Guid orderId);
-            OrderItem GetOrderItem(Guid id);
-            void SaveOrderItem(OrderItem orderItem);
+            Task <OrderItem> GetOrderItem(Guid id);
+            Task<OrderItem> SaveOrderItem(OrderItem orderItem);
             void UpdateOrderItem(OrderItem orderItem);
             void DeleteOrderItem(OrderItem orderItem);
     }

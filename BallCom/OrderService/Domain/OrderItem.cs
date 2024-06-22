@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace OrderService.Domain
 {
@@ -11,7 +12,10 @@ namespace OrderService.Domain
         public string ProductName { get; set; }
         public decimal ProductPrice { get; set; }
         public int Quantity { get; set; }
-        public Order Order { get; set; } 
 
+        // is purely a reference to the Order object for entity framework
+        // JsonIgnore is used to prevent circular reference when serializing the object
+        [JsonIgnore]
+        public Order Order { get; set; } 
     }
 }
