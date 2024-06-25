@@ -400,3 +400,7 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+BallCom/InventoryService/Migrations/
+
+BallCom/OrderService/Migrations/

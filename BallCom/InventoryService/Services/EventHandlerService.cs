@@ -12,9 +12,23 @@ namespace InventoryService.Services
 {
     public class EventHandlerService(
         IWriteRepository<ProductBaseEvent> eventWriteRepo,
-        IWriteRepository<Product> productWriteRepo)
+        IWriteRepository<Product> productWriteRepo,
+        IReadRepository<Product> readRepository)
         : IEventHandlerService
     {
+        public async Task ProcessOrderCreatedEvent(Order order)
+        {
+            if(order.OrderItems != null)
+            {
+                foreach (var orderItem in order.OrderItems)
+                {
+                    var oldProduct = await readRepository.GetByIdAsync(orderItem.ProductId);
+                    oldProduct.Quantity -= orderItem.Quantity;
+                    await ProcessProductUpdatedEvent(oldProduct);
+                }
+            }
+        }
+
         public async Task ProcessProductCreatedEvent(Product product)
         {
             var productCreatedEvent = new ProductCreateEvent
