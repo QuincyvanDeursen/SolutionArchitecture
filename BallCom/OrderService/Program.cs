@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using OrderService.Database;
+using OrderService.Domain;
 using OrderService.Repository;
 using OrderService.Repository.Interface;
 using OrderService.Services.RabbitMQ;
@@ -14,6 +15,7 @@ using OrderService.Services.Interface;
 using Shared.MessageBroker.Connection;
 using OrderService.EventHandlers.Interfaces;
 using OrderService.EventHandlers;
+using Shared.Repository.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +28,9 @@ builder.Services.AddScoped<IOrderItemRepo, OrderItemRepo>();
 builder.Services.AddScoped<IOrderEventHandler, OrderEventHandler>();
 builder.Services.AddScoped<IOrderService, OrderService.Services.OrderService>();
 builder.Services.AddScoped<IInventoryServiceClient, InventoryServiceClient>();
+builder.Services.AddScoped<IEventHandlerService, EventHandlerService>();
+
+builder.Services.AddScoped<IWriteRepository<Payment>, PaymentWriteRepo>();
 
 // Add RabbitMQ Publisher and Consumer services.
 var exchangeName = builder.Configuration.GetValue<string>("RabbitMQ:ExchangeName");
