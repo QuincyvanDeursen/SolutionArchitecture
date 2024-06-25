@@ -12,15 +12,20 @@ using Shared.MessageBroker.Publisher.Interfaces;
 using OrderService.Services;
 using OrderService.Services.Interface;
 using Shared.MessageBroker.Connection;
+using OrderService.EventHandlers.Interfaces;
+using OrderService.EventHandlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("Default");
-builder.Services.AddDbContext<OrderDbContext>(
+builder.Services.AddDbContext<AppDbContext>(
     options => options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IOrderRepo, OrderRepo>();
 builder.Services.AddScoped<IOrderItemRepo, OrderItemRepo>();
+builder.Services.AddScoped<IOrderEventHandler, OrderEventHandler>();
+builder.Services.AddScoped<IOrderService, OrderService.Services.OrderService>();
+builder.Services.AddScoped<IInventoryServiceClient, InventoryServiceClient>();
 
 // Add RabbitMQ Publisher and Consumer services.
 var exchangeName = builder.Configuration.GetValue<string>("RabbitMQ:ExchangeName");
@@ -33,9 +38,10 @@ builder.Services.AddSingleton<IMessageConsumer>(x => new RabbitMqMessageConsumer
 // Add a hosted service for listening to RabbitMQ messages (consumer).
 builder.Services.AddHostedService<OrderMessageListenerService>();
 
-builder.Services.AddScoped<IOrderService, OrderService.Services.OrderService>();
-builder.Services.AddScoped<IInventoryServiceClient, InventoryServiceClient>();
 builder.Services.AddControllers();
+
+builder.Services.AddHttpClient();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -44,7 +50,7 @@ builder.Services.AddSwaggerGen();
 if (builder.Environment.IsProduction())
 {
     using var scope = builder.Services.BuildServiceProvider().CreateScope();
-    var dbContext = scope.ServiceProvider.GetRequiredService<OrderDbContext>();
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     dbContext.Database.Migrate();
 }
 

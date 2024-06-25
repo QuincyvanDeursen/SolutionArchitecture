@@ -1,5 +1,7 @@
 ﻿using OrderService.Domain;
 using OrderService.DTO;
+using OrderService.EventHandlers.Interfaces;
+using OrderService.Events;
 using OrderService.Repository.Interface;
 using OrderService.Services.Interface;
 
@@ -9,58 +11,62 @@ namespace OrderService.Services
     {
         private readonly IInventoryServiceClient _inventoryServiceClient;
         private readonly IOrderRepo _orderRepo;
-        private readonly IOrderItemRepo _orderItemRepo;
+        private readonly IOrderEventHandler _orderEventHandler;
+        private readonly ILogger<OrderService> _logger;
 
-        public OrderService(IInventoryServiceClient inventoryServiceClient, IOrderRepo orderRepo, IOrderItemRepo orderItemRepo)
+        public OrderService(IInventoryServiceClient inventoryServiceClient, IOrderRepo orderRepo, IOrderEventHandler orderEventHandler, ILogger<OrderService> logger)
         {
             _inventoryServiceClient = inventoryServiceClient;
             _orderRepo = orderRepo;
-            _orderItemRepo = orderItemRepo;
+            _orderEventHandler = orderEventHandler;
+            _logger = logger;
         }
 
-        public async Task<bool> CreateOrder(OrderCreateDto orderCreateDto)
+        public async Task CreateOrder(OrderCreateDto orderCreateDto)
         {
             if (IsOrderWithinProductLimit(orderCreateDto.OrderItems) && await CheckStock(orderCreateDto.OrderItems))
+            {
+                var Id = Guid.NewGuid();
+                var orderItems = ConvertToOrderItem(orderCreateDto.OrderItems, Id);
+                var order = new Order
                 {
-                    var Id = Guid.NewGuid();
-                    var orderItems = ConvertToOrderItem(orderCreateDto.OrderItems, Id);
-                    var order = new Order
-                    {
-                        Id = Id,
-                        OrderDate = DateTime.Now,
-                        CustomerId = orderCreateDto.CustomerId,
-                        Address = orderCreateDto.Address,
-                        OrderItems = orderItems,
-                    };
-                    
-                    //Order opslaan
-                    await _orderRepo.SaveOrder(order);
-                    
-                    //Orderitems opslaan
-                    foreach (var orderItem in order.OrderItems)
-                    {
-                        _orderItemRepo.SaveOrderItem(orderItem);
-                    }
-                    return true;
-                }
-            return false;
+                    Id = Id,
+                    OrderDate = DateTime.Now,
+                    CustomerId = orderCreateDto.CustomerId,
+                    Address = orderCreateDto.Address,
+                    OrderItems = orderItems,
+                    Totalprice = orderItems.Sum(i => i.ProductPrice * i.Quantity)
+                };
+
+                //Order opslaan
+                await _orderRepo.CreateOrder(order);
+
+                var OrderCreatedEvent = new OrderCreatedEvent(order);
+                await _orderEventHandler.Handle(OrderCreatedEvent);
+            } else
+            {
+                _logger.LogError("One or more products are not in stock");
+                throw new Exception("One or more products are not in stock");
+            }
         }
         private async Task<bool> CheckStock(ICollection<OrderItemCreateDto> orderItems)
         {
-            foreach (var orderItem in orderItems)
+            var products = new List<ProductStockDto>();
+            foreach (var item in orderItems)
             {
-                var product = await _inventoryServiceClient.GetInventoryAsync(orderItem.ProductId);
-                if (product.Quantity < orderItem.Quantity)
+                ProductStockDto product = new ProductStockDto
                 {
-                    throw new Exception($"Not enough inventory for product {orderItem.ProductId}");
-                }
+                    ProductId = item.ProductId,
+                    Quantity = item.Quantity
+                };
+                products.Add(product);
             }
-            return true;
+            return await _inventoryServiceClient.CheckStockAsync(products);
         }
 
-        private bool IsOrderWithinProductLimit (ICollection<OrderItemCreateDto> orderItems) 
+        private bool IsOrderWithinProductLimit(ICollection<OrderItemCreateDto> orderItems)
         {
-            if(orderItems.Count <= 20)
+            if (orderItems.Count <= 20)
             {
                 return true;
             }
@@ -70,7 +76,7 @@ namespace OrderService.Services
         private ICollection<OrderItem> ConvertToOrderItem(ICollection<OrderItemCreateDto> orderItemCreateDtos, Guid id)
         {
             var orderItems = new List<OrderItem>();
-            foreach(var item in orderItemCreateDtos)
+            foreach (var item in orderItemCreateDtos)
             {
                 var orderItem = new OrderItem
                 {
@@ -81,6 +87,7 @@ namespace OrderService.Services
                     ProductPrice = item.ProductPrice,
                     Quantity = item.Quantity
                 };
+                orderItems.Add(orderItem);
             }
             return orderItems;
         }
@@ -93,6 +100,32 @@ namespace OrderService.Services
         public async Task<IEnumerable<Order>> GetAllOrders()
         {
             return await _orderRepo.GetAllOrdersAsync();
+        }
+
+        public async Task UpdateOrder(Guid id, OrderUpdateDto order)
+        {
+            var existingOrder = await _orderRepo.GetOrder(id);
+            if (existingOrder == null)
+            {
+                throw new KeyNotFoundException($"Order with ID {id} not found.");
+            }
+
+            existingOrder.Address = order.Address;
+
+            await _orderRepo.UpdateOrder(existingOrder);
+        }
+
+        public async Task UpdateOrderStatus(Guid id, OrderStatusUpdateDto order)
+        {
+            var existingOrder = await _orderRepo.GetOrder(id);
+            if (existingOrder == null)
+            {
+                throw new KeyNotFoundException($"Order with ID {id} not found.");
+            }
+
+            existingOrder.OrderStatus = order.OrderStatus;
+
+            await _orderRepo.UpdateOrder(existingOrder);
         }
     }
 }

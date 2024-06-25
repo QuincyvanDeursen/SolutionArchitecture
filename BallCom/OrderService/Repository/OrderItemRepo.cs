@@ -1,4 +1,5 @@
-﻿using OrderService.Database;
+﻿using Microsoft.EntityFrameworkCore;
+using OrderService.Database;
 using OrderService.Domain;
 using OrderService.Repository.Interface;
 
@@ -6,9 +7,9 @@ namespace OrderService.Repository
 {
     public class OrderItemRepo : IOrderItemRepo
     {
-        private readonly OrderDbContext _context;
+        private readonly AppDbContext _context;
 
-        public OrderItemRepo(OrderDbContext context) { 
+        public OrderItemRepo(AppDbContext context) { 
             _context = context;
         }
         public void DeleteOrderItem(OrderItem orderItem)
@@ -16,14 +17,14 @@ namespace OrderService.Repository
             _context.OrderItems.Remove(orderItem);
         }
 
-        public OrderItem GetOrderItem(Guid id)
+        public async Task<OrderItem> GetOrderItem(Guid id)
         {
-           return  _context.OrderItems.First(i => i.Id == id);
+            return await _context.OrderItems.FirstAsync(i => i.Id == id);
         }
 
-        public IEnumerable<OrderItem> GetOrderItems()
+        public async Task<IEnumerable<OrderItem>> GetOrderItems()
         {
-            return _context.OrderItems.ToList();
+            return await _context.OrderItems.ToListAsync();
         }
 
         public IEnumerable<OrderItem> GetOrderItemsByOrderId(Guid orderId)
@@ -31,14 +32,16 @@ namespace OrderService.Repository
             return _context.OrderItems.Where(i => i.OrderId == orderId).ToList();
         }
 
-        public void SaveOrderItem(OrderItem orderItem)
-        {
-            _context.Add(orderItem);
-        }
-
         public void UpdateOrderItem(OrderItem orderItem)
         {
             _context.OrderItems.Update(orderItem);
+        }
+
+        public async Task<OrderItem> SaveOrderItem(OrderItem orderItem)
+        {
+            var savedOrderItem = await _context.AddAsync(orderItem);
+            await _context.SaveChangesAsync();
+            return savedOrderItem.Entity;
         }
     }
 }
