@@ -7,5 +7,6 @@ namespace InventoryService.Services.Interfaces
     {
         Task ProcessProductCreatedEvent(Product product);
         Task ProcessProductUpdatedEvent(Product product);
+        Task ProcessOrderCreatedEvent(Order order);
     }
 }
