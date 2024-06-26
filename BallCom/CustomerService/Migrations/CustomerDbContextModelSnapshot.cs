@@ -55,7 +55,7 @@ namespace CustomerService.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("d43c3429-dd30-4384-baba-6b2eb425bfca"),
+                            Id = new Guid("e7f53e2b-0e68-4dea-8b81-f636ad4c1e98"),
                             Address = "Avansstraat 123, 1234AB Breda",
                             CompanyName = "ICTutor",
                             FirstName = "Sybrand",
@@ -64,7 +64,7 @@ namespace CustomerService.Migrations
                         },
                         new
                         {
-                            Id = new Guid("2cf9b7df-e7fd-461d-8697-500a13826406"),
+                            Id = new Guid("b30226fe-cb36-451d-b28e-e1158cbea431"),
                             Address = "Avansstraat 123, 1234AB Breda",
                             CompanyName = "Willy's",
                             FirstName = "Tristan",
@@ -73,7 +73,7 @@ namespace CustomerService.Migrations
                         },
                         new
                         {
-                            Id = new Guid("d1b96ae1-ec78-43b6-83b5-bce5359b2dc6"),
+                            Id = new Guid("5e24d267-480e-4954-8654-0041f5f38f62"),
                             Address = "Avansstraat 123, 1234AB Breda",
                             CompanyName = "Dropshipper",
                             FirstName = "Thimo",

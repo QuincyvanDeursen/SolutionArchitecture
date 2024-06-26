@@ -23,6 +23,8 @@ namespace CustomerService.Database
 
             modelBuilder.Entity<Customer>().HasKey(c => c.Id);
             modelBuilder.Entity<Customer>().HasData(customers);
+            
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

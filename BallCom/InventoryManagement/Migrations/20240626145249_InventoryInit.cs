@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace InventoryManagement.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InventoryInit : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -39,6 +41,15 @@ namespace InventoryManagement.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Products", x => x.Id);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Products",
+                columns: new[] { "Id", "Description", "Name", "Price", "Stock" },
+                values: new object[,]
+                {
+                    { new Guid("2583abb5-89e7-49b4-b4d2-e5055e7eba8b"), "Description 2", "Product 2", 20m, 20 },
+                    { new Guid("4ada76f7-2ca0-476f-8a9a-73a8323a008c"), "Description 1", "Product 1", 10m, 10 }
                 });
         }
 

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InventoryManagement.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240626104405_event discriminator fixed")]
-    partial class eventdiscriminatorfixed
+    [Migration("20240626145249_InventoryInit")]
+    partial class InventoryInit
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -52,7 +52,7 @@ namespace InventoryManagement.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("5cbac35f-ed55-4816-bea8-ad255963a37e"),
+                            Id = new Guid("4ada76f7-2ca0-476f-8a9a-73a8323a008c"),
                             Description = "Description 1",
                             Name = "Product 1",
                             Price = 10m,
@@ -60,7 +60,7 @@ namespace InventoryManagement.Migrations
                         },
                         new
                         {
-                            Id = new Guid("d6aebfc2-0600-4f10-bc55-f71d98573a74"),
+                            Id = new Guid("2583abb5-89e7-49b4-b4d2-e5055e7eba8b"),
                             Description = "Description 2",
                             Name = "Product 2",
                             Price = 20m,
@@ -103,6 +103,20 @@ namespace InventoryManagement.Migrations
                     b.HasBaseType("InventoryManagement.Events.Event");
 
                     b.HasDiscriminator().HasValue("ProductCreatedEvent");
+                });
+
+            modelBuilder.Entity("InventoryManagement.Events.ProductUpdatedEvent", b =>
+                {
+                    b.HasBaseType("InventoryManagement.Events.Event");
+
+                    b.HasDiscriminator().HasValue("ProductUpdatedEvent");
+                });
+
+            modelBuilder.Entity("InventoryManagement.Events.StockDecreasedEvent", b =>
+                {
+                    b.HasBaseType("InventoryManagement.Events.Event");
+
+                    b.HasDiscriminator().HasValue("StockDecreasedEvent");
                 });
 
             modelBuilder.Entity("InventoryManagement.Events.StockIncreasedEvent", b =>

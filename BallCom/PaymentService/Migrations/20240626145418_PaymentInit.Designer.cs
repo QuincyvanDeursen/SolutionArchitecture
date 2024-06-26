@@ -11,15 +11,9 @@ using PaymentService.Database;
 
 namespace PaymentService.Migrations
 {
-<<<<<<<< HEAD:BallCom/OrderService/Migrations/20240625190525_initialCreate.Designer.cs
-    [DbContext(typeof(AppDbContext))]
-    [Migration("20240625190525_initialCreate")]
-    partial class initialCreate
-========
     [DbContext(typeof(PaymentDbContext))]
-    [Migration("20240626085758_AddedForeignKeyRelations")]
-    partial class AddedForeignKeyRelations
->>>>>>>> main:BallCom/PaymentService/Migrations/20240626085758_AddedForeignKeyRelations.Designer.cs
+    [Migration("20240626145418_PaymentInit")]
+    partial class PaymentInit
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,7 +25,7 @@ namespace PaymentService.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Shared.Models.Payment", b =>
+            modelBuilder.Entity("Shared.Models.Payment.Payment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -58,7 +52,7 @@ namespace PaymentService.Migrations
                     b.ToTable("Payments");
                 });
 
-            modelBuilder.Entity("Shared.Models.PaymentCustomer", b =>
+            modelBuilder.Entity("Shared.Models.Payment.PaymentCustomer", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -77,7 +71,7 @@ namespace PaymentService.Migrations
                     b.ToTable("Customers");
                 });
 
-            modelBuilder.Entity("Shared.Models.PaymentOrder", b =>
+            modelBuilder.Entity("Shared.Models.Payment.PaymentOrder", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -101,15 +95,15 @@ namespace PaymentService.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("Shared.Models.Payment", b =>
+            modelBuilder.Entity("Shared.Models.Payment.Payment", b =>
                 {
-                    b.HasOne("Shared.Models.PaymentCustomer", "Customer")
+                    b.HasOne("Shared.Models.Payment.PaymentCustomer", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Shared.Models.PaymentOrder", "Order")
+                    b.HasOne("Shared.Models.Payment.PaymentOrder", "Order")
                         .WithMany()
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)

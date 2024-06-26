@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PaymentService.Migrations
 {
     /// <inheritdoc />
-    public partial class AddedForeignKeyRelations : Migration
+    public partial class PaymentInit : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

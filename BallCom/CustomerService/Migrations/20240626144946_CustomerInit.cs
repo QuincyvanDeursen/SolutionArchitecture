@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CustomerService.Migrations
 {
     /// <inheritdoc />
-    public partial class initialCreate : Migration
+    public partial class CustomerInit : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -34,9 +34,9 @@ namespace CustomerService.Migrations
                 columns: new[] { "Id", "Address", "CompanyName", "FirstName", "LastName", "PhoneNumber" },
                 values: new object[,]
                 {
-                    { new Guid("2cf9b7df-e7fd-461d-8697-500a13826406"), "Avansstraat 123, 1234AB Breda", "Willy's", "Tristan", "Goossens", "0612345678" },
-                    { new Guid("d1b96ae1-ec78-43b6-83b5-bce5359b2dc6"), "Avansstraat 123, 1234AB Breda", "Dropshipper", "Thimo", "Luijsterburg", "0612345678" },
-                    { new Guid("d43c3429-dd30-4384-baba-6b2eb425bfca"), "Avansstraat 123, 1234AB Breda", "ICTutor", "Sybrand", "Bos", "0612345678" }
+                    { new Guid("5e24d267-480e-4954-8654-0041f5f38f62"), "Avansstraat 123, 1234AB Breda", "Dropshipper", "Thimo", "Luijsterburg", "0612345678" },
+                    { new Guid("b30226fe-cb36-451d-b28e-e1158cbea431"), "Avansstraat 123, 1234AB Breda", "Willy's", "Tristan", "Goossens", "0612345678" },
+                    { new Guid("e7f53e2b-0e68-4dea-8b81-f636ad4c1e98"), "Avansstraat 123, 1234AB Breda", "ICTutor", "Sybrand", "Bos", "0612345678" }
                 });
         }
 

@@ -49,7 +49,7 @@ namespace InventoryManagement.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("09a5d14f-a802-42ea-a292-52b7fe2f7667"),
+                            Id = new Guid("4ada76f7-2ca0-476f-8a9a-73a8323a008c"),
                             Description = "Description 1",
                             Name = "Product 1",
                             Price = 10m,
@@ -57,7 +57,7 @@ namespace InventoryManagement.Migrations
                         },
                         new
                         {
-                            Id = new Guid("9db90037-da44-4a74-a499-ef4f60860439"),
+                            Id = new Guid("2583abb5-89e7-49b4-b4d2-e5055e7eba8b"),
                             Description = "Description 2",
                             Name = "Product 2",
                             Price = 20m,
