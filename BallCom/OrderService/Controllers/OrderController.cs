@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using OrderService.Domain;
 using OrderService.DTO;
 using OrderService.Services.Interface;
+using Shared.Models;
 
 namespace OrderService.Controllers
 {
@@ -48,7 +49,7 @@ namespace OrderService.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing order");
-                return BadRequest("Error processing order, certain items might be out of stock");
+                return BadRequest(ex.Message);
             }
         }
 
@@ -66,20 +67,21 @@ namespace OrderService.Controllers
                 return BadRequest("Error updating order");
             }
         }
-
-        [HttpPut("{id}/status")]
-        public async Task<ActionResult> UpdateOrderStatus(Guid id, [FromBody] OrderStatusUpdateDto order)
-        {
-            try
-            {
-                await _orderService.UpdateOrderStatus(id, order);
-                return Ok("Order updated successfully");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error updating order");
-                return BadRequest("Error updating order");
-            }
-        }
+        
+        //
+        // [HttpPut("{id}/status")]
+        // public async Task<ActionResult> UpdateOrderStatus(Guid id, [FromBody] OrderStatusUpdateDto order)
+        // {
+        //     try
+        //     {
+        //         await _orderService.UpdateOrderStatus(id, order);
+        //         return Ok("Order updated successfully");
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         _logger.LogError(ex, "Error updating order");
+        //         return BadRequest("Error updating order");
+        //     }
+        // }
     }
 }

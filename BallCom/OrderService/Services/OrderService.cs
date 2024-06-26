@@ -1,131 +1,132 @@
 ﻿using OrderService.Domain;
 using OrderService.DTO;
-using OrderService.EventHandlers.Interfaces;
-using OrderService.Events;
-using OrderService.Repository.Interface;
 using OrderService.Services.Interface;
+using Shared.MessageBroker.Publisher.Interfaces;
+using Shared.Models;
+using Shared.Repository.Interface;
 
 namespace OrderService.Services
 {
-    public class OrderService : IOrderService
+    public class OrderService(
+        IInventoryServiceClient inventoryServiceClient,
+        IWriteRepository<Order> orderWriteRepository,
+        IReadRepository<Order> orderReadRepository,
+        IReadRepository<OrderProduct> orderProductReadRepository,
+        IMessagePublisher messagePublisher
+        ) : IOrderService
     {
-        private readonly IInventoryServiceClient _inventoryServiceClient;
-        private readonly IOrderRepo _orderRepo;
-        private readonly IOrderEventHandler _orderEventHandler;
-        private readonly ILogger<OrderService> _logger;
-
-        public OrderService(IInventoryServiceClient inventoryServiceClient, IOrderRepo orderRepo, IOrderEventHandler orderEventHandler, ILogger<OrderService> logger)
-        {
-            _inventoryServiceClient = inventoryServiceClient;
-            _orderRepo = orderRepo;
-            _orderEventHandler = orderEventHandler;
-            _logger = logger;
-        }
-
-        public async Task CreateOrder(OrderCreateDto orderCreateDto)
-        {
-            if (IsOrderWithinProductLimit(orderCreateDto.OrderItems) && await CheckStock(orderCreateDto.OrderItems))
-            {
-                var Id = Guid.NewGuid();
-                var orderItems = ConvertToOrderItem(orderCreateDto.OrderItems, Id);
-                var order = new Order
-                {
-                    Id = Id,
-                    OrderDate = DateTime.Now,
-                    CustomerId = orderCreateDto.CustomerId,
-                    Address = orderCreateDto.Address,
-                    OrderItems = orderItems,
-                    Totalprice = orderItems.Sum(i => i.ProductPrice * i.Quantity)
-                };
-
-                //Order opslaan
-                await _orderRepo.CreateOrder(order);
-
-                var OrderCreatedEvent = new OrderCreatedEvent(order);
-                await _orderEventHandler.Handle(OrderCreatedEvent);
-            } else
-            {
-                _logger.LogError("One or more products are not in stock");
-                throw new Exception("One or more products are not in stock");
-            }
-        }
-        private async Task<bool> CheckStock(ICollection<OrderItemCreateDto> orderItems)
-        {
-            var products = new List<ProductStockDto>();
-            foreach (var item in orderItems)
-            {
-                ProductStockDto product = new ProductStockDto
-                {
-                    ProductId = item.ProductId,
-                    Quantity = item.Quantity
-                };
-                products.Add(product);
-            }
-            return await _inventoryServiceClient.CheckStockAsync(products);
-        }
-
-        private bool IsOrderWithinProductLimit(ICollection<OrderItemCreateDto> orderItems)
-        {
-            if (orderItems.Count <= 20)
-            {
-                return true;
-            }
-            return false;
-        }
-
-        private ICollection<OrderItem> ConvertToOrderItem(ICollection<OrderItemCreateDto> orderItemCreateDtos, Guid id)
-        {
-            var orderItems = new List<OrderItem>();
-            foreach (var item in orderItemCreateDtos)
-            {
-                var orderItem = new OrderItem
-                {
-                    Id = Guid.NewGuid(),
-                    OrderId = id,
-                    ProductName = item.ProductName,
-                    ProductId = item.ProductId,
-                    ProductPrice = item.ProductPrice,
-                    Quantity = item.Quantity
-                };
-                orderItems.Add(orderItem);
-            }
-            return orderItems;
-        }
-
         public async Task<Order> GetOrderById(Guid id)
         {
-            return await _orderRepo.GetOrder(id);
+            // 1. Get order by id from the repository and return it
+            return await orderReadRepository.GetByIdAsync(id);
         }
 
         public async Task<IEnumerable<Order>> GetAllOrders()
         {
-            return await _orderRepo.GetAllOrdersAsync();
+            // 1. Get all orders from the repository and return them
+            return await orderReadRepository.GetAllAsync();
+        }
+        
+        public async Task CreateOrder(OrderCreateDto orderCreateDto)
+        {
+            // 1. Check if the order contains more than 20 items
+            if (orderCreateDto.OrderItems.Count > 20)
+                throw new ArgumentException("You can only order a maximum of 20 items at a time");
+            
+            // 2. Check if all products are in stock
+            // TODO: Re-enable this check after fixing the inventory service
+            // if (!await inventoryServiceClient.CheckStockAsync(orderCreateDto.OrderItems))
+            //     throw new Exception("One or more products are not in stock");
+            
+            // 3. Check if all order items exist in the database
+            if (!await AllOrderProductsExist(orderCreateDto.OrderItems))
+                throw new KeyNotFoundException("One or more products in the order do not exist");
+            
+            // 3. Convert DTO to domain model
+            var orderId = Guid.NewGuid();
+            var order = new Order
+            {
+                Id = orderId,
+                OrderDate = DateTime.Now,
+                CustomerId = orderCreateDto.CustomerId,
+                Address = orderCreateDto.Address,
+                OrderItems = orderCreateDto.OrderItems.Select(oi => new OrderItem
+                {
+                    OrderId = orderId,
+                    ProductId = oi.ProductId,
+                    Quantity = oi.Quantity
+                }).ToList()
+            };
+            
+            order.TotalPrice = await GetTotalOrderPrice(order.OrderItems);
+            
+            // 4. Save order to database
+            await orderWriteRepository.CreateAsync(order);
+            
+            // 5. Send a message that a new order has been placed
+            await messagePublisher.PublishAsync(order, "order.create");
         }
 
-        public async Task UpdateOrder(Guid id, OrderUpdateDto order)
+        public async Task UpdateOrder(Guid id, OrderUpdateDto newOrder)
         {
-            var existingOrder = await _orderRepo.GetOrder(id);
+            // 1. Check if the order exists
+            var existingOrder = await orderReadRepository.GetByIdAsync(id);
             if (existingOrder == null)
-            {
-                throw new KeyNotFoundException($"Order with ID {id} not found.");
-            }
-
-            existingOrder.Address = order.Address;
-
-            await _orderRepo.UpdateOrder(existingOrder);
+                throw new KeyNotFoundException("Order was not found");
+            
+            // 2. Update only updateable properties
+            existingOrder.Address = newOrder.Address;
+            
+            // 3. Save the updated order to the database
+            await orderWriteRepository.UpdateAsync(existingOrder);
+            
+            // 4. Send a message that the order has been updated
+            await messagePublisher.PublishAsync(existingOrder, "order.update");
         }
 
-        public async Task UpdateOrderStatus(Guid id, OrderStatusUpdateDto order)
+        public async Task UpdateOrderStatus(Guid id, OrderUpdateStatusDto newOrder)
         {
-            var existingOrder = await _orderRepo.GetOrder(id);
+            // 1. Check if the order exists
+            var existingOrder = await orderReadRepository.GetByIdAsync(id);
             if (existingOrder == null)
+                throw new KeyNotFoundException("Order was not found");
+            
+            // 2. Check if the new status is valid (only "Shipped", "Delivered" and "Failed" are allowed)
+            if (newOrder.Status != OrderStatus.Shipped && newOrder.Status != OrderStatus.Delivered &&
+                newOrder.Status != OrderStatus.Failed)
             {
-                throw new KeyNotFoundException($"Order with ID {id} not found.");
+                throw new ArgumentException("Changing to this order status is not allowed directly");
             }
+            
+            // 3. Update only the status
+            existingOrder.Status = newOrder.Status;
+            
+            // 3. Save the updated order to the database
+            await orderWriteRepository.UpdateAsync(existingOrder);
+            
+            // 4. Send a message that the order has been updated
+            await messagePublisher.PublishAsync(existingOrder, "order.update");
+        }
 
-            existingOrder.OrderStatus = order.OrderStatus;
+        private async Task<bool> AllOrderProductsExist(ICollection<OrderItemDto> orderItems)
+        {
+            foreach (var item in orderItems)
+            {
+                var product = await orderProductReadRepository.GetByIdAsync(item.ProductId);
+                if (product == null) return false;
+            }
+            return true;
+        }
 
-            await _orderRepo.UpdateOrder(existingOrder);
+        private async Task<decimal> GetTotalOrderPrice(ICollection<OrderItem> orderItems)
+        {
+            decimal totalPrice = 0;
+            foreach (var item in orderItems)
+            {
+                var product = await orderProductReadRepository.GetByIdAsync(item.ProductId);
+                totalPrice += product.Price * item.Quantity;
+            }
+            return totalPrice;
         }
     }
 }

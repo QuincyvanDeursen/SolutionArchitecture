@@ -2,10 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using OrderService.Database;
 using OrderService.Domain;
 using OrderService.Repository;
-using OrderService.Repository.Interface;
 using OrderService.Services.RabbitMQ;
-using RabbitMQ.Client;
-using Shared.MessageBroker;
 using Shared.MessageBroker.Consumer;
 using Shared.MessageBroker.Consumer.Interfaces;
 using Shared.MessageBroker.Publisher;
@@ -13,24 +10,28 @@ using Shared.MessageBroker.Publisher.Interfaces;
 using OrderService.Services;
 using OrderService.Services.Interface;
 using Shared.MessageBroker.Connection;
-using OrderService.EventHandlers.Interfaces;
-using OrderService.EventHandlers;
+using OrderService.Services.RabbitMQ.EventHandlers;
+using OrderService.Services.RabbitMQ.EventHandlers.Interfaces;
+using Shared.Models;
 using Shared.Repository.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("Default");
-builder.Services.AddDbContext<AppDbContext>(
+builder.Services.AddDbContext<OrderDbContext>(
     options => options.UseSqlServer(connectionString));
-builder.Services.AddScoped<IOrderRepo, OrderRepo>();
-builder.Services.AddScoped<IOrderItemRepo, OrderItemRepo>();
-builder.Services.AddScoped<IOrderEventHandler, OrderEventHandler>();
+
 builder.Services.AddScoped<IOrderService, OrderService.Services.OrderService>();
 builder.Services.AddScoped<IInventoryServiceClient, InventoryServiceClient>();
+
 builder.Services.AddScoped<IEventHandlerService, EventHandlerService>();
 
-builder.Services.AddScoped<IWriteRepository<Payment>, PaymentWriteRepo>();
+// Add entity repositories
+builder.Services.AddScoped<IWriteRepository<Order>, OrderWriteRepo>();
+builder.Services.AddScoped<IReadRepository<Order>, OrderReadRepo>();
+builder.Services.AddScoped<IReadRepository<OrderProduct>, ProductReadRepo>();
+builder.Services.AddScoped<IWriteRepository<OrderPayment>, PaymentWriteRepo>();
 
 // Add RabbitMQ Publisher and Consumer services.
 var exchangeName = builder.Configuration.GetValue<string>("RabbitMQ:ExchangeName");
@@ -55,7 +56,7 @@ builder.Services.AddSwaggerGen();
 if (builder.Environment.IsProduction())
 {
     using var scope = builder.Services.BuildServiceProvider().CreateScope();
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var dbContext = scope.ServiceProvider.GetRequiredService<OrderDbContext>();
     dbContext.Database.Migrate();
 }
 

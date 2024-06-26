@@ -17,7 +17,7 @@ namespace OrderService.Services
             _logger = logger;
         }
 
-        public async Task<bool> CheckStockAsync(List<ProductStockDto> productsFromOrder)
+        public async Task<bool> CheckStockAsync(List<OrderItemDto> productsFromOrder)
         {
             try
             {
