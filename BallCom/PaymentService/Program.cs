@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using PaymentService.Database;
-using PaymentService.Domain;
 using PaymentService.Repository;
 using PaymentService.Services.Interfaces;
 using PaymentService.Services.RabbitMQ;

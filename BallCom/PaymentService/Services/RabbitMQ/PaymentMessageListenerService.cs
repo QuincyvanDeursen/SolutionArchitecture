@@ -15,12 +15,13 @@ public class PaymentMessageListenerService(IMessageConsumer messageConsumer, ISe
         await messageConsumer.ConsumeAsync(OnMessageReceived, new []
         {
             "order.create",
+            "order.update",
             "customer.create",
             "customer.update",
         });
     }
 
-    public async Task OnMessageReceived(MessageEventData data)
+    private async Task OnMessageReceived(MessageEventData data)
     {
         // Create a new scope for the event handler service (scoped service)
         using var scope = serviceProvider.CreateScope();
@@ -41,12 +42,15 @@ public class PaymentMessageListenerService(IMessageConsumer messageConsumer, ISe
                 var createdOrder = JsonSerializer.Deserialize<Order>(data.DataJson);
                 await orderEventHandlerService.ProcessOrderCreateEvent(PaymentRelatedEntityMapper.MapOrderToPaymentOrder(createdOrder));
                 break;
+            case "order.update":
+                var updatedOrder = JsonSerializer.Deserialize<Order>(data.DataJson);
+                await orderEventHandlerService.ProcessOrderUpdateEvent(PaymentRelatedEntityMapper.MapOrderToPaymentOrder(updatedOrder));
+                break;
         }
     }
 
-    public Task StopAsync(CancellationToken cancellationToken)
+    public async Task StopAsync(CancellationToken cancellationToken)
     {
-        // TODO: Implement the stop logic for the connection
-        return Task.CompletedTask;
+        await messageConsumer.DisconnectAsync();
     }
 }

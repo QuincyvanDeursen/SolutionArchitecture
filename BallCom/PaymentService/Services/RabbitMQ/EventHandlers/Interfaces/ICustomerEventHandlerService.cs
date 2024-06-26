@@ -1,4 +1,4 @@
-using PaymentService.Domain;
+using Shared.Models;
 
 namespace PaymentService.Services.RabbitMQ.EventHandlers.Interfaces;
 

@@ -1,4 +1,3 @@
-using PaymentService.Domain;
 using Shared.Models;
 
 namespace PaymentService.Services.Mapper;

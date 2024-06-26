@@ -1,5 +1,4 @@
-﻿using PaymentService.Domain;
-using Shared.Models;
+﻿using Shared.Models;
 
 namespace PaymentService.Services.Interfaces
 {

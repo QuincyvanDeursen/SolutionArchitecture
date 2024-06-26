@@ -9,11 +9,17 @@ public class PaymentReadRepo(PaymentDbContext context) : IReadRepository<Payment
 {
     public async Task<Payment> GetByIdAsync(Guid id)
     {
-        return await context.Payments.FirstOrDefaultAsync(p => p.Id == id);
+        return await context.Payments
+            .Include(p => p.Customer)
+            .Include(p => p.Order)
+            .FirstOrDefaultAsync(p => p.Id == id);
     }
 
     public async Task<IEnumerable<Payment>> GetAllAsync()
     {
-        return await context.Payments.ToListAsync();
+        return await context.Payments
+            .Include(p => p.Customer)
+            .Include(p => p.Order)
+            .ToListAsync();
     }
 }

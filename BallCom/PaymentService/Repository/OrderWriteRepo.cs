@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using PaymentService.Database;
-using PaymentService.Domain;
 using Shared.Models;
 using Shared.Repository.Interface;
 

@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PaymentService.Domain;
 using Shared.Models;
 
 
@@ -13,15 +12,17 @@ namespace PaymentService.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            IEnumerable<Payment> payments = new List<Payment>
-            {
-                new Payment { Id = Guid.NewGuid(), OrderId = Guid.NewGuid(), CustomerId = Guid.NewGuid(), TotalPrice = 100.00m, Status = PaymentStatus.Paid },
-                new Payment { Id = Guid.NewGuid(), OrderId = Guid.NewGuid(), CustomerId = Guid.NewGuid(), TotalPrice = 200.00m, Status = PaymentStatus.Paid },
-                new Payment { Id = Guid.NewGuid(), OrderId = Guid.NewGuid(), CustomerId = Guid.NewGuid(), TotalPrice = 300.00m, Status = PaymentStatus.Pending}
-            };
-
-            modelBuilder.Entity<Payment>().HasKey(i => i.Id);
-            modelBuilder.Entity<Payment>().HasData(payments);
+            // Configure a one-to-many relationship between PaymentCustomer and Payment
+            modelBuilder.Entity<PaymentCustomer>()
+                .HasMany(c => c.Payments)
+                .WithOne(p => p.Customer)
+                .HasForeignKey(p => p.CustomerId);
+            
+            // Configure a one-to-one relationship between Payment and PaymentOrder
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.Order)
+                .WithOne(o => o.Payment)
+                .HasForeignKey<PaymentOrder>(o => o.Id);
         }
     }
 }
