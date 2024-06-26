@@ -22,21 +22,13 @@ namespace InventoryService.Repository
         public async Task UpdateAsync(Product entity)
         {
             var oldProduct = await _context.Products.FindAsync(entity.Id);
-
-            if (oldProduct == null)
+            if(oldProduct != null)
             {
-                throw new KeyNotFoundException();
+                oldProduct.Quantity = entity.Quantity;
+
+                _context.Products.Update(oldProduct);
+                await _context.SaveChangesAsync();
             }
-
-            var quantity = oldProduct.Quantity + entity.Quantity;
-
-            if (quantity < 0)
-            {
-                //TODO: cancel een update inventory en plaats bericht op bus met juiste label
-            }
-
-            _context.Products.Update(oldProduct);
-            await _context.SaveChangesAsync();
         }
     }
 }

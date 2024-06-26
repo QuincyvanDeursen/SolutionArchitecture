@@ -41,6 +41,11 @@ public class ProductMessageListenerService(IMessageConsumer messageConsumer, ISe
                 
                 await eventHandlerService.ProcessProductUpdatedEvent(updateProduct);
                 break;
+            case "order.create":
+                var order = JsonSerializer.Deserialize<Order>(data.DataJson);
+
+                await eventHandlerService.ProcessOrderCreatedEvent(order);
+                break;
             default:
                 throw new ArgumentException(data.Topic + " is not a subscribed topic.");
         }
