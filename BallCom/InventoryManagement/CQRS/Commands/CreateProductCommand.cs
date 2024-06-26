@@ -1,6 +1,8 @@
-﻿namespace InventoryManagement.Commands
+﻿using InventoryManagement.CQRS.Commands.Interfaces;
+
+namespace InventoryManagement.CQRS.Commands
 {
-    public class CreateProductCommand
+    public class CreateProductCommand : ICommand
     {
         public string Name { get; set; }
         public string Description { get; set; }

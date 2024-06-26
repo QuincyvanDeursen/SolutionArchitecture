@@ -1,6 +1,8 @@
-﻿namespace InventoryManagement.Commands
+﻿using InventoryManagement.CQRS.Commands.Interfaces;
+
+namespace InventoryManagement.CQRS.Commands
 {
-    public class IncreaseStockCommand
+    public class IncreaseStockCommand : ICommand
     {
         public Guid AggregateId { get; set; }
         public int Amount { get; set; }

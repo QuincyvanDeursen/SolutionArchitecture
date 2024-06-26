@@ -21,7 +21,10 @@ namespace InventoryManagement.Repository
 
         public async Task<IEnumerable<Event>> GetAllByIdAsync(Guid aggregateId)
         {
-            return await _context.ProductEvents.Where(e => e.AggregateId == aggregateId).ToListAsync();
+            return await _context.ProductEvents
+                .Where(e => e.AggregateId == aggregateId)
+                .OrderBy(x => x.EventTime)
+                .ToListAsync();
         }
 
         public Task<Event> GetByIdAsync(Guid id)

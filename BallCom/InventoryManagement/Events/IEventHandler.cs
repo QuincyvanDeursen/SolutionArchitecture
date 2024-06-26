@@ -6,6 +6,10 @@ namespace InventoryManagement.Events
     {
         Task HandleProductCreatedAsync(Product product);
 
-        Task HandlestockIncreasedAsync(Guid aggregateId);
+        Task HandleProductUpdatedAsync(Product product);
+
+        Task HandleStockIncreasedAsync(Guid aggregateId);
+
+        Task HandleStockDecreasedAsync(Guid aggregateId);
     }
 }

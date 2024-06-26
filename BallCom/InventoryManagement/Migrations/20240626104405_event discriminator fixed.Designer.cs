@@ -4,6 +4,7 @@ using InventoryManagement.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InventoryManagement.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240626104405_event discriminator fixed")]
+    partial class eventdiscriminatorfixed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,7 +52,7 @@ namespace InventoryManagement.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("09a5d14f-a802-42ea-a292-52b7fe2f7667"),
+                            Id = new Guid("5cbac35f-ed55-4816-bea8-ad255963a37e"),
                             Description = "Description 1",
                             Name = "Product 1",
                             Price = 10m,
@@ -57,7 +60,7 @@ namespace InventoryManagement.Migrations
                         },
                         new
                         {
-                            Id = new Guid("9db90037-da44-4a74-a499-ef4f60860439"),
+                            Id = new Guid("d6aebfc2-0600-4f10-bc55-f71d98573a74"),
                             Description = "Description 2",
                             Name = "Product 2",
                             Price = 20m,
@@ -100,20 +103,6 @@ namespace InventoryManagement.Migrations
                     b.HasBaseType("InventoryManagement.Events.Event");
 
                     b.HasDiscriminator().HasValue("ProductCreatedEvent");
-                });
-
-            modelBuilder.Entity("InventoryManagement.Events.ProductUpdatedEvent", b =>
-                {
-                    b.HasBaseType("InventoryManagement.Events.Event");
-
-                    b.HasDiscriminator().HasValue("ProductUpdatedEvent");
-                });
-
-            modelBuilder.Entity("InventoryManagement.Events.StockDecreasedEvent", b =>
-                {
-                    b.HasBaseType("InventoryManagement.Events.Event");
-
-                    b.HasDiscriminator().HasValue("StockDecreasedEvent");
                 });
 
             modelBuilder.Entity("InventoryManagement.Events.StockIncreasedEvent", b =>

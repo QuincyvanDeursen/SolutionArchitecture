@@ -51,13 +51,17 @@ namespace InventoryManagement.Database
                 entity.Property(e => e.EventType).IsRequired();
 
                 entity.HasDiscriminator<string>("EventType")
-                    .HasValue<ProductCreatedEvent>("ProductCreated")
-                    .HasValue<StockIncreasedEvent>("StockIncreased");
+                    .HasValue<ProductCreatedEvent>("ProductCreatedEvent")
+                    .HasValue<ProductUpdatedEvent>("ProductUpdatedEvent")
+                    .HasValue<StockIncreasedEvent>("StockIncreasedEvent")
+                    .HasValue<StockDecreasedEvent>("StockDecreasedEvent");
             });
 
             // Explicitly register the entities if necessary
             modelBuilder.Entity<ProductCreatedEvent>();
+            modelBuilder.Entity<ProductUpdatedEvent>();
             modelBuilder.Entity<StockIncreasedEvent>();
+            modelBuilder.Entity<StockDecreasedEvent>();
         }
     }
 }

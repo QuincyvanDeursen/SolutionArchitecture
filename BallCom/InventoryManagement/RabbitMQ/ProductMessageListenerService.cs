@@ -1,4 +1,6 @@
-﻿using InventoryManagement.Domain;
+﻿using InventoryManagement.CQRS.Commands;
+using InventoryManagement.CQRS.Commands.Handler;
+using InventoryManagement.Domain;
 using InventoryManagement.Events;
 using Shared.MessageBroker;
 using Shared.MessageBroker.Consumer.Interfaces;
@@ -12,9 +14,9 @@ namespace InventoryManagement.RabbitMQ
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<ProductMessageListenerService> _logger;
 
-        public ProductMessageListenerService(IMessageConsumer messageConsumer, IServiceProvider serviceProvider, ILogger<ProductMessageListenerService> logger)
+        public ProductMessageListenerService(IMessageConsumer messageConsumer, IServiceProvider serviceProvider,
+            ILogger<ProductMessageListenerService> logger)
         {
-            
             _messageConsumer = messageConsumer;
             _serviceProvider = serviceProvider;
             _logger = logger;
@@ -24,8 +26,8 @@ namespace InventoryManagement.RabbitMQ
         {
             await _messageConsumer.ConsumeAsync(OnMessageReceived, new[]
             {
-            "product.created","product.stockincreased"
-        });
+                "product.created", "product.updated", "product.stockincreased", "product.stockdecreased"
+            });
         }
 
         public async Task OnMessageReceived(MessageEventData data)
@@ -33,19 +35,60 @@ namespace InventoryManagement.RabbitMQ
             // Create a new scope for the event handler service (scoped service)
             using var scope = _serviceProvider.CreateScope();
             var eventHandler = scope.ServiceProvider.GetRequiredService<IEventHandler>();
+            var commandHandler = scope.ServiceProvider.GetRequiredService<ProductCommandHandler>();
 
             switch (data.Topic)
             {
                 case "product.created":
+                {
                     _logger.LogInformation("Product created event received");
                     var product = JsonSerializer.Deserialize<Product>(data.DataJson);
                     _logger.LogInformation(data.DataJson);
                     await eventHandler.HandleProductCreatedAsync(product);
+                }
+                    break;
+                case "product.updated":
+                {
+                    _logger.LogInformation("Product updated event received");
+                    var product = JsonSerializer.Deserialize<Product>(data.DataJson);
+                    await eventHandler.HandleProductUpdatedAsync(product);
+                }
                     break;
                 case "product.stockincreased":
+                {
                     _logger.LogInformation("Product increased event received");
-                    var product2 = JsonSerializer.Deserialize<Product>(data.DataJson);
-                    await eventHandler.HandlestockIncreasedAsync(product2.Id);
+                    var product = JsonSerializer.Deserialize<Product>(data.DataJson);
+                    await eventHandler.HandleStockIncreasedAsync(product.Id);
+                }
+                    break;
+                case "product.stockdecreased":
+                {
+                    _logger.LogInformation("Product decreased event received");
+                    var product = JsonSerializer.Deserialize<Product>(data.DataJson);
+                    await eventHandler.HandleStockDecreasedAsync(product.Id);
+                }
+                    break;
+                case "dummyorder.created":
+                    // Do nothing, this is a dummy event
+                    _logger.LogInformation("Dummy order created event received");
+                    var order = JsonSerializer.Deserialize<DummyOrder>(data.DataJson);
+
+                    foreach (var item in order.Items)
+                    {
+                        _logger.LogInformation($"Product Id: {item.ProductId}, Amount: {item.Amount}");
+                        await commandHandler.Handle(new DecreaseStockCommand(item.ProductId, item.Amount));
+                    }
+                    break;
+                case "dummyorder.cancelled":
+                    // Do nothing, this is a dummy event
+                    _logger.LogInformation("Dummy order cancelled event received");
+                    var cancelledOrder = JsonSerializer.Deserialize<DummyOrder>(data.DataJson);
+
+                    foreach (var item in cancelledOrder.Items)
+                    {
+                        _logger.LogInformation($"Product Id: {item.ProductId}, Amount: {item.Amount}");
+                        await commandHandler.Handle(new IncreaseStockCommand(item.ProductId, item.Amount));
+                    }
                     break;
                 default:
                     throw new ArgumentException(data.Topic + " is not a subscribed topic.");

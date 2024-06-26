@@ -34,9 +34,23 @@ namespace InventoryManagement.Domain
             Stock = @event.Product.Stock;
         }
 
+        public void Apply(ProductUpdatedEvent @event)
+        {
+            Id = @event.AggregateId;
+            Name = @event.Product.Name;
+            Description = @event.Product.Description;
+            Price = @event.Product.Price;
+            Stock = @event.Product.Stock;
+        }
+
         public void Apply(StockIncreasedEvent @event)
         {
-            Stock += @event.Product.Stock ;
+            Stock += @event.Product.Stock;
+        }
+
+        public void Apply(StockDecreasedEvent @event)
+        {
+            Stock -= @event.Product.Stock;
         }
     }
 }

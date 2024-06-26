@@ -1,4 +1,4 @@
-using InventoryManagement.Commands;
+using InventoryManagement.CQRS.Commands;
 using InventoryManagement.Database;
 using InventoryManagement.Domain;
 using InventoryManagement.Events;
@@ -11,6 +11,11 @@ using Shared.MessageBroker.Consumer.Interfaces;
 using Shared.MessageBroker.Publisher;
 using Shared.MessageBroker.Publisher.Interfaces;
 using Shared.Repository.Interface;
+using InventoryManagement.CQRS.Queries;
+using InventoryManagement.CQRS.Queries.Handler;
+using InventoryManagement.CQRS.Commands.Handler;
+using InventoryManagement.CQRS.Commands.Interfaces;
+using InventoryManagement.CQRS.Queries.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +26,16 @@ builder.Services.AddDbContext<AppDbContext>(
 
 builder.Services.AddScoped<ProductCommandHandler>();
 builder.Services.AddScoped<IEventHandler, InventoryManagement.Events.EventHandler>();
+
+//Query handlers for read
+builder.Services.AddScoped<IQueryHandler<GetProductQuery, Product>, ProductQueryHandler>();
+builder.Services.AddScoped<IQueryHandler<GetAllProductsQuery, IEnumerable<Product>>, ProductQueryHandler>();
+
+//Command handlers for write
+builder.Services.AddScoped<ICommandHandler<CreateProductCommand>, ProductCommandHandler>();
+builder.Services.AddScoped<ICommandHandler<UpdateProductCommand>, ProductCommandHandler>();
+builder.Services.AddScoped<ICommandHandler<IncreaseStockCommand>, ProductCommandHandler>();
+builder.Services.AddScoped<ICommandHandler<DecreaseStockCommand>, ProductCommandHandler>();
 
 builder.Services.AddScoped<IWriteRepository<Event>, ProductEventWriteRepo>();
 builder.Services.AddScoped<IWriteRepository<Product>, ProductWriteRepo>();

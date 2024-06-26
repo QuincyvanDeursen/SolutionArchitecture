@@ -22,12 +22,21 @@ namespace InventoryManagement.Events
             await _productRepository.CreateAsync(product);
         }
 
-        public async Task HandlestockIncreasedAsync(Guid aggregateId)
+        public async Task HandleProductUpdatedAsync(Product product)
         {
+            await _productRepository.UpdateAsync(product);
+        }
 
+        public async Task HandleStockIncreasedAsync(Guid aggregateId)
+        {
             var product = await ReplayEvents(aggregateId);    
             await _productRepository.UpdateAsync(product);
-            
+        }
+
+        public async Task HandleStockDecreasedAsync(Guid aggregateId)
+        {
+            var product = await ReplayEvents(aggregateId);
+            await _productRepository.UpdateAsync(product);
         }
 
         private async Task<Product> ReplayEvents(Guid aggregateId)
@@ -40,18 +49,23 @@ namespace InventoryManagement.Events
                 var product = JsonSerializer.Deserialize<Product>(@event.Data);
 
                 @event.Product = product;
-                _logger.LogInformation("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
                 _logger.LogInformation("Event Data: {0}", @event.Data);
                 switch (@event)
                 {
                     case ProductCreatedEvent e:
-                        _logger.LogInformation(" 1 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+                        productState.Apply(e);
+                        break;
+                    case ProductUpdatedEvent e:
                         productState.Apply(e);
                         break;
                     case StockIncreasedEvent e:
-                        _logger.LogInformation(" 2 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
                         productState.Apply(e);
                         break;
+                    case StockDecreasedEvent e:
+                        productState.Apply(e);
+                        break;
+                    default:
+                        throw new Exception("Unknown event type");
                 }
             }
 
