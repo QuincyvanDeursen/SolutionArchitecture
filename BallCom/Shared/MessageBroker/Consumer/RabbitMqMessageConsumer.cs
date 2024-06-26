@@ -67,11 +67,17 @@ public class RabbitMqMessageConsumer : IMessageConsumer
             var eventData = JsonSerializer.Deserialize<MessageEventData>(Encoding.UTF8.GetString(body));
             
             Console.WriteLine($"[{eventData.EventTimestamp}] Received message from bus (id -> {eventData.Id},topic -> {eventData.Topic})");
+            Console.WriteLine($"[{eventData.EventTimestamp}] Payload: {eventData.DataJson}");
             
             await onMessageReceived(eventData);
         };
         
         // Start consuming
         await channel.BasicConsumeAsync(queue: _queueName, autoAck: true, consumer: consumer);
+    }
+
+    public async Task DisconnectAsync()
+    {
+        (await _connection.Value).Dispose();
     }
 }
