@@ -1,5 +1,4 @@
-﻿using OrderService.Domain;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using OrderService.Services.Interface;
 using OrderService.DTO;
 using System.Text;

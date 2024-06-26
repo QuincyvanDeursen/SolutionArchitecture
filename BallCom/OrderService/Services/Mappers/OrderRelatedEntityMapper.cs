@@ -1,5 +1,7 @@
-using OrderService.Domain;
 using Shared.Models;
+using Shared.Models.Customer;
+using Shared.Models.Order;
+using Shared.Models.Payment;
 
 namespace OrderService.Services.Mappers;
 
@@ -13,6 +15,17 @@ public static class OrderRelatedEntityMapper
             OrderId = payment.OrderId,
             CustomerId = payment.CustomerId,
             Status = payment.Status
+        };
+    }
+    
+    public static OrderCustomer ToOrderCustomer(this Customer customer)
+    {
+        return new OrderCustomer
+        {
+            Id = customer.Id,
+            Name = $"{customer.FirstName} {customer.LastName}",
+            Address = customer.Address,
+            PhoneNumber = customer.PhoneNumber
         };
     }
 }
