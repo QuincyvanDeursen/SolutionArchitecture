@@ -12,8 +12,8 @@ using OrderService.Database;
 namespace OrderService.Migrations
 {
     [DbContext(typeof(OrderDbContext))]
-    [Migration("20240626111642_FinishedOrderFKRelations")]
-    partial class FinishedOrderFKRelations
+    [Migration("20240626122646_RemovedCircularReferenceProblem")]
+    partial class RemovedCircularReferenceProblem
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -85,7 +85,7 @@ namespace OrderService.Migrations
 
             modelBuilder.Entity("Shared.Models.Order.OrderItem", b =>
                 {
-                    b.Property<Guid>("OrderProductId")
+                    b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("OrderId")
@@ -97,7 +97,7 @@ namespace OrderService.Migrations
                     b.Property<decimal>("SnapshotPrice")
                         .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("OrderProductId", "OrderId");
+                    b.HasKey("ProductId", "OrderId");
 
                     b.HasIndex("OrderId");
 
@@ -181,17 +181,21 @@ namespace OrderService.Migrations
 
             modelBuilder.Entity("Shared.Models.Order.OrderItem", b =>
                 {
-                    b.HasOne("Shared.Models.Order.Order", null)
+                    b.HasOne("Shared.Models.Order.Order", "Order")
                         .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Shared.Models.Order.OrderProduct", null)
+                    b.HasOne("Shared.Models.Order.OrderProduct", "Product")
                         .WithMany("OrderItems")
-                        .HasForeignKey("OrderProductId")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Shared.Models.Order.Order", b =>

@@ -14,7 +14,6 @@ namespace Shared.Models.Order
         
         
         // Payment related entities (eventual consistency)
-        // Can be ignored when serializing as this is specific to payments
         public ICollection<OrderItem> OrderItems { get; init; }
         public OrderPayment? Payment { get; set; }
         public OrderCustomer Customer { get; set; }

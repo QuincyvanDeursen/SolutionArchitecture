@@ -13,4 +13,8 @@ public interface IEventHandlerService
     // Customer events
     Task ProcessCustomerCreatedEvent(OrderCustomer customer);
     Task ProcessCustomerUpdatedEvent(OrderCustomer customer);
+    
+    // Product events
+    Task ProcessProductCreatedEvent(OrderProduct product);
+    Task ProcessProductUpdatedEvent(OrderProduct product);
 }

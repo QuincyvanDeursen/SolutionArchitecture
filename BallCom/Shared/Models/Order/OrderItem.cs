@@ -1,4 +1,6 @@
-﻿namespace Shared.Models.Order
+﻿using System.Text.Json.Serialization;
+
+namespace Shared.Models.Order
 {
     public class OrderItem
     {
@@ -8,6 +10,12 @@
         
         // Related ids (also composite key)
         public Guid OrderId { get; set; }
-        public Guid OrderProductId { get; set; }
+        public Guid ProductId { get; set; }
+        
+        // Navigation properties
+        public OrderProduct Product { get; set; }
+        
+        [JsonIgnore]
+        public Order Order { get; set; }
     }
 }

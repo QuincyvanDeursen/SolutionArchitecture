@@ -33,6 +33,7 @@ builder.Services.AddScoped<IReadRepository<Order>, OrderReadRepo>();
 builder.Services.AddScoped<IReadRepository<OrderProduct>, ProductReadRepo>();
 builder.Services.AddScoped<IWriteRepository<OrderPayment>, PaymentWriteRepo>();
 builder.Services.AddScoped<IWriteRepository<OrderCustomer>, CustomerWriteRepo>();
+builder.Services.AddScoped<IWriteRepository<OrderProduct>, ProductWriteRepo>();
 
 // Add RabbitMQ Publisher and Consumer services.
 var exchangeName = builder.Configuration.GetValue<string>("RabbitMQ:ExchangeName");
@@ -45,6 +46,7 @@ builder.Services.AddSingleton<IMessageConsumer>(x => new RabbitMqMessageConsumer
 // Add a hosted service for listening to RabbitMQ messages (consumer).
 builder.Services.AddHostedService<OrderMessageListenerService>();
 
+// Disable loop handling when serializing JSON
 builder.Services.AddControllers();
 
 builder.Services.AddHttpClient();

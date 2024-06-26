@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Shared.Models.Order;
 
 public class OrderProduct
@@ -7,5 +9,7 @@ public class OrderProduct
     public decimal Price { get; set; }
     
     // Navigation properties 
-    public ICollection<OrderItem>? OrderItems { get; set; }
+    // This property is not serialized to avoid circular reference
+    [JsonIgnore]
+    public ICollection<OrderItem> OrderItems { get; set; }
 }
