@@ -103,7 +103,12 @@ namespace OrderService.Services
             {
                 throw new ArgumentException($"Changing from {existingOrder.Status} to status {newOrder.Status} is not allowed directly");
             }
-            
+
+            if(existingOrder.Status == OrderStatus.Failed || existingOrder.Status == OrderStatus.Placed)
+            {
+                throw new InvalidOperationException("Order status cannot be updated after it has been failed or is pending");
+            }
+
             // 3. Update only the status
             existingOrder.Status = newOrder.Status;
             
@@ -117,7 +122,7 @@ namespace OrderService.Services
             }
             else
             {
-                await messagePublisher.PublishAsync(existingOrder, "order.updated");
+                await messagePublisher.PublishAsync(existingOrder, "order.statusUpdated");
             }
         }
 

@@ -21,7 +21,7 @@ public class OrderMessageListenerService(IMessageConsumer messageConsumer, IServ
             "customer.created",
             "customer.updated",
             "payment.created",
-            "payment.updated",
+            "payment.statusUpdated",
             "payment.cancelled",
             "product.created",
             "product.updated"
@@ -48,7 +48,7 @@ public class OrderMessageListenerService(IMessageConsumer messageConsumer, IServ
                 var createPayment = JsonSerializer.Deserialize<Payment>(data.DataJson);
                 await eventHandlerService.ProcessPaymentCreatedEvent(createPayment.ToOrderPayment());
                 break;
-            case "payment.updated":
+            case "payment.statusUpdated":
                 var updatePayment = JsonSerializer.Deserialize<Payment>(data.DataJson);
                 await eventHandlerService.ProcessPaymentUpdatedEvent(updatePayment.ToOrderPayment());
                 break;

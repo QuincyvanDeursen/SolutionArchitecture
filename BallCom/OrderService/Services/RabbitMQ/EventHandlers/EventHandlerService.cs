@@ -25,9 +25,6 @@ namespace OrderService.Services.RabbitMQ.EventHandlers
             order.PaymentId = payment.Id;
             
             await orderWriteRepo.UpdateAsync(order);
-            
-            // 3. Send a message that a order has been updated
-            await messagePublisher.PublishAsync(order, "order.updated");
         }
 
         public async Task ProcessPaymentUpdatedEvent(OrderPayment payment)
@@ -51,7 +48,7 @@ namespace OrderService.Services.RabbitMQ.EventHandlers
             }
             else
             {
-                await messagePublisher.PublishAsync(order, "order.updated");
+                await messagePublisher.PublishAsync(order, "order.statusUpdated");
             }
         }
 

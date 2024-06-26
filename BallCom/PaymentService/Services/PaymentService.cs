@@ -39,6 +39,6 @@ public class PaymentService(
         await paymentWriteRepo.UpdateAsync(oldPayment);
         
         // 2. Publish an event to notify other services
-        await messagePublisher.PublishAsync(oldPayment, "payment.updated");
+        await messagePublisher.PublishAsync(oldPayment, "payment.statusUpdated");
     }
 }
