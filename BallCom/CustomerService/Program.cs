@@ -25,6 +25,18 @@ builder.Services.AddDbContext<CustomerDbContext>(
 builder.Services.AddScoped<ICustomerRepo, CustomerRepo>();
 builder.Services.AddScoped<ICustomerService, CustomerService.Services.CustomerService>();
 
+// Add RabbitMQ Publisher and Consumer services.
+var exchangeName = builder.Configuration.GetValue<string>("RabbitMQ:ExchangeName");
+var queueName = builder.Configuration.GetValue<string>("RabbitMQ:QueueName");
+
+builder.Services.AddSingleton<IConnectionProvider>(x => new RabbitMqConnectionProvider(builder.Configuration.GetValue<string>("RabbitMQ:Uri") ?? ""));
+builder.Services.AddSingleton<IMessagePublisher>(x => new RabbitMqMessagePublisher(x.GetService<IConnectionProvider>(), exchangeName));
+builder.Services.AddSingleton<IMessageConsumer>(x => new RabbitMqMessageConsumer(x.GetService<IConnectionProvider>(), exchangeName, queueName));
+
+// Add a hosted service for listening to RabbitMQ messages (consumer).
+builder.Services.AddHostedService<CustomerMessageListenerService>();
+
+// Add cronjob service
 builder.Services.AddHostedService<CronJobService>();
 
 builder.Services.AddControllers();
@@ -60,17 +72,6 @@ builder.Services.AddHttpClient();
 // Run migrations if in production
 if (builder.Environment.IsProduction())
 {
-    // Add RabbitMQ Publisher and Consumer services.
-    var exchangeName = builder.Configuration.GetValue<string>("RabbitMQ:ExchangeName");
-    var queueName = builder.Configuration.GetValue<string>("RabbitMQ:QueueName");
-
-    builder.Services.AddSingleton<IConnectionProvider>(x => new RabbitMqConnectionProvider(builder.Configuration.GetValue<string>("RabbitMQ:Uri") ?? ""));
-    builder.Services.AddSingleton<IMessagePublisher>(x => new RabbitMqMessagePublisher(x.GetService<IConnectionProvider>(), exchangeName));
-    builder.Services.AddSingleton<IMessageConsumer>(x => new RabbitMqMessageConsumer(x.GetService<IConnectionProvider>(), exchangeName, queueName));
-
-    // Add a hosted service for listening to RabbitMQ messages (consumer).
-    builder.Services.AddHostedService<CustomerMessageListenerService>();
-
     using var scope = builder.Services.BuildServiceProvider().CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<CustomerDbContext>();
     dbContext.Database.Migrate();
