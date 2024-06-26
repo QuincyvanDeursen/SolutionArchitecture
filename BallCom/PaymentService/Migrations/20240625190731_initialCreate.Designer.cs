@@ -5,14 +5,14 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using OrderService.Database;
+using PaymentService.Database;
 
 #nullable disable
 
-namespace OrderService.Migrations
+namespace PaymentService.Migrations
 {
-    [DbContext(typeof(OrderDbContext))]
-    [Migration("20240621075730_initialCreate")]
+    [DbContext(typeof(PaymentDbContext))]
+    [Migration("20240625190731_initialCreate")]
     partial class initialCreate
     {
         /// <inheritdoc />
@@ -25,13 +25,65 @@ namespace OrderService.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("OrderService.Domain.Order", b =>
+            modelBuilder.Entity("PaymentService.Domain.Invoice", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Address")
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Invoices");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("103ef75c-6bbd-4c18-911b-9f880ea309b5"),
+                            CustomerId = 1,
+                            OrderId = 1,
+                            Status = 2,
+                            TotalAmount = 100.00m
+                        },
+                        new
+                        {
+                            Id = new Guid("ecb258be-b224-4dc5-9d13-6f30087bbec7"),
+                            CustomerId = 2,
+                            OrderId = 2,
+                            Status = 2,
+                            TotalAmount = 200.00m
+                        },
+                        new
+                        {
+                            Id = new Guid("d354b7c0-9482-4627-a45e-fe40c85ee280"),
+                            CustomerId = 3,
+                            OrderId = 3,
+                            Status = 1,
+                            TotalAmount = 300.00m
+                        });
+                });
+
+            modelBuilder.Entity("PaymentService.Domain.Order", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Adress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("City")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("CustomerId")
@@ -43,6 +95,9 @@ namespace OrderService.Migrations
                     b.Property<int?>("PaymentId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Postalcode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("Totalprice")
                         .HasColumnType("decimal(18,2)");
 
@@ -51,7 +106,7 @@ namespace OrderService.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("OrderService.Domain.OrderItem", b =>
+            modelBuilder.Entity("PaymentService.Domain.OrderItem", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -77,12 +132,12 @@ namespace OrderService.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderItems");
+                    b.ToTable("OrderItem");
                 });
 
-            modelBuilder.Entity("OrderService.Domain.OrderItem", b =>
+            modelBuilder.Entity("PaymentService.Domain.OrderItem", b =>
                 {
-                    b.HasOne("OrderService.Domain.Order", "Order")
+                    b.HasOne("PaymentService.Domain.Order", "Order")
                         .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -91,7 +146,7 @@ namespace OrderService.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("OrderService.Domain.Order", b =>
+            modelBuilder.Entity("PaymentService.Domain.Order", b =>
                 {
                     b.Navigation("OrderItems");
                 });
