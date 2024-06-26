@@ -27,4 +27,9 @@ public class OrderReadRepo(OrderDbContext context) : IReadRepository<Order>
             .ThenInclude(oi => oi.Product)
             .ToListAsync();
     }
+
+    public Task<IEnumerable<Order>> GetAllByIdAsync(Guid aggergateId)
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -23,4 +23,9 @@ public class PaymentReadRepo(PaymentDbContext context) : IReadRepository<Payment
             .Include(p => p.Order)
             .ToListAsync();
     }
+
+    public Task<IEnumerable<Payment>> GetAllByIdAsync(Guid aggergateId)
+    {
+        throw new NotImplementedException();
+    }
 }

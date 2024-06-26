@@ -16,4 +16,9 @@ public class ProductReadRepo(OrderDbContext context) : IReadRepository<OrderProd
     {
         return await context.Products.ToListAsync();
     }
+
+    public Task<IEnumerable<OrderProduct>> GetAllByIdAsync(Guid aggergateId)
+    {
+        throw new NotImplementedException();
+    }
 }
