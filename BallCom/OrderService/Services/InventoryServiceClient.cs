@@ -1,5 +1,4 @@
-﻿using OrderService.Domain;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using OrderService.Services.Interface;
 using OrderService.DTO;
 using System.Text;
@@ -17,7 +16,7 @@ namespace OrderService.Services
             _logger = logger;
         }
 
-        public async Task<bool> CheckStockAsync(List<ProductStockDto> productsFromOrder)
+        public async Task<bool> CheckStockAsync(List<OrderItemDto> productsFromOrder)
         {
             try
             {

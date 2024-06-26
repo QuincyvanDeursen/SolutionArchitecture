@@ -1,6 +1,4 @@
-﻿using OrderService.Domain;
-
-namespace OrderService.DTO
+﻿namespace OrderService.DTO
 {
     public class OrderUpdateDto
     {

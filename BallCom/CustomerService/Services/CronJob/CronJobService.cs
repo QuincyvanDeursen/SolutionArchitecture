@@ -26,6 +26,9 @@ namespace CustomerService.Services.CronJob
             var currentTime = DateTime.Now;
             var midnight = DateTime.Today.AddDays(1);
             var timeToMidnight = midnight - currentTime;
+            
+            // TODO: Remove starting timeout
+            Thread.Sleep(10000);
 
             // Create a timer that runs the background task
             timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromMinutes(2)); // Runs every 24 hours
@@ -67,7 +70,6 @@ namespace CustomerService.Services.CronJob
 
             using var scope = host.Services.CreateScope();
             var customerService = scope.ServiceProvider.GetRequiredService<ICustomerService>();
-            var messageBroker = scope.ServiceProvider.GetRequiredService<IMessagePublisher>();
 
             // Save the customers to the database
             var oldCustomers = await customerService.GetAll();
@@ -85,8 +87,6 @@ namespace CustomerService.Services.CronJob
 
                 // Save new customer to the database
                 await customerService.Create(customer);
-
-         
             }
 
             _logger.LogInformation($"Added {count} new customers to the database.");   

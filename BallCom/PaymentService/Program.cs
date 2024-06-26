@@ -1,22 +1,38 @@
 using Microsoft.EntityFrameworkCore;
 using PaymentService.Database;
 using PaymentService.Repository;
-using PaymentService.Repository.Interfaces;
+using PaymentService.Services.Interfaces;
 using PaymentService.Services.RabbitMQ;
-using Shared.MessageBroker;
+using PaymentService.Services.RabbitMQ.EventHandlers;
+using PaymentService.Services.RabbitMQ.EventHandlers.Interfaces;
 using Shared.MessageBroker.Connection;
 using Shared.MessageBroker.Consumer;
 using Shared.MessageBroker.Consumer.Interfaces;
 using Shared.MessageBroker.Publisher;
 using Shared.MessageBroker.Publisher.Interfaces;
+using Shared.Models;
+using Shared.Models.Payment;
+using Shared.Repository.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add database context service
 var connectionString = builder.Configuration.GetConnectionString("Default");
 builder.Services.AddDbContext<PaymentDbContext>(
     options => options.UseSqlServer(connectionString));
-builder.Services.AddScoped<IInvoiceRepo, InvoiceRepo>();
+
+// Add Repository services
+builder.Services.AddScoped<IWriteRepository<PaymentCustomer>, CustomerWriteRepo>();
+builder.Services.AddScoped<IWriteRepository<PaymentOrder>, OrderWriteRepo>();
+builder.Services.AddScoped<IWriteRepository<Payment>, PaymentWriteRepo>();
+builder.Services.AddScoped<IReadRepository<Payment>, PaymentReadRepo>();
+
+// Add Event handler services
+builder.Services.AddScoped<IOrderEventHandlerService, OrderEventHandlerService>();
+builder.Services.AddScoped<ICustomerEventHandlerService, CustomerEventHandlerService>();
+
+// Add Microservice services
+builder.Services.AddScoped<IPaymentService, PaymentService.Services.PaymentService>();
 
 // Add RabbitMQ Publisher and Consumer services.
 var exchangeName = builder.Configuration.GetValue<string>("RabbitMQ:ExchangeName");
@@ -30,7 +46,8 @@ builder.Services.AddSingleton<IMessageConsumer>(x => new RabbitMqMessageConsumer
 builder.Services.AddHostedService<PaymentMessageListenerService>();
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+// Add swagger services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -44,7 +61,7 @@ if (builder.Environment.IsProduction())
 
 var app = builder.Build();
 
-// Add swagger middleware
+// Enable Swagger middleware (endpoint: /swagger/index.html)
 app.UseSwagger();
 app.UseSwaggerUI();
 
