@@ -1,6 +1,6 @@
-﻿using OrderService.Domain;
-using OrderService.DTO;
+﻿using OrderService.DTO;
 using Shared.Models;
+using Shared.Models.Order;
 
 namespace OrderService.Services.Interface
 {

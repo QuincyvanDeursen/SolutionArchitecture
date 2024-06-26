@@ -1,5 +1,6 @@
 using OrderService.Database;
 using Shared.Models;
+using Shared.Models.Order;
 using Shared.Repository.Interface;
 
 namespace OrderService.Repository;

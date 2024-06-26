@@ -1,7 +1,9 @@
-﻿using OrderService.Domain;
-using OrderService.Services.RabbitMQ.EventHandlers.Interfaces;
+﻿using OrderService.Services.RabbitMQ.EventHandlers.Interfaces;
 using Shared.MessageBroker.Publisher.Interfaces;
 using Shared.Models;
+using Shared.Models.Customer;
+using Shared.Models.Order;
+using Shared.Models.Payment;
 using Shared.Repository.Interface;
 
 namespace OrderService.Services.RabbitMQ.EventHandlers
@@ -10,6 +12,7 @@ namespace OrderService.Services.RabbitMQ.EventHandlers
         IWriteRepository<OrderPayment> paymentWriteRepo,
         IReadRepository<Order> orderReadRepo,
         IWriteRepository<Order> orderWriteRepo,
+        IWriteRepository<OrderCustomer> customerWriteRepo,
         IMessagePublisher messagePublisher
     ) : IEventHandlerService
     {
@@ -44,6 +47,17 @@ namespace OrderService.Services.RabbitMQ.EventHandlers
             
             // 3. Publish the order status update event
             await messagePublisher.PublishAsync(order, "order.update");
+        }
+        public async Task ProcessCustomerCreatedEvent(OrderCustomer customer)
+        {
+            // 1. Create a new customer (eventual consistency)
+            await customerWriteRepo.CreateAsync(customer);
+        }
+
+        public async Task ProcessCustomerUpdatedEvent(OrderCustomer customer)
+        {
+            // 1. Update existing customer (eventual consistency)
+            await customerWriteRepo.UpdateAsync(customer);
         }
     }
 }

@@ -1,10 +1,12 @@
 using System.Text.Json;
 using PaymentService.Services.Interfaces;
-using PaymentService.Services.Mapper;
+using PaymentService.Services.Mappers;
 using PaymentService.Services.RabbitMQ.EventHandlers.Interfaces;
 using Shared.MessageBroker;
 using Shared.MessageBroker.Consumer.Interfaces;
 using Shared.Models;
+using Shared.Models.Customer;
+using Shared.Models.Order;
 
 namespace PaymentService.Services.RabbitMQ;
 

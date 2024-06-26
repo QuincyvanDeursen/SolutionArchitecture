@@ -1,5 +1,6 @@
-using OrderService.Domain;
 using Shared.Models;
+using Shared.Models.Order;
+using Shared.Models.Payment;
 
 namespace OrderService.Extensions;
 

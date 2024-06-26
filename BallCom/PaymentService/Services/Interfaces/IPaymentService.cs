@@ -1,5 +1,6 @@
 using PaymentService.Dto;
 using Shared.Models;
+using Shared.Models.Payment;
 
 namespace PaymentService.Services.Interfaces;
 

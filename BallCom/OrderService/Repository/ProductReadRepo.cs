@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using OrderService.Database;
-using OrderService.Domain;
+using Shared.Models.Order;
 using Shared.Repository.Interface;
 
 namespace OrderService.Repository;

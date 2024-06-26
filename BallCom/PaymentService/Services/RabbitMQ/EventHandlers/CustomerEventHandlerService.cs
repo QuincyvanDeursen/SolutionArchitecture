@@ -1,6 +1,7 @@
 using PaymentService.Services.RabbitMQ.EventHandlers.Interfaces;
 using Shared.MessageBroker.Publisher.Interfaces;
 using Shared.Models;
+using Shared.Models.Payment;
 using Shared.Repository.Interface;
 
 namespace PaymentService.Services.RabbitMQ.EventHandlers;

@@ -2,6 +2,7 @@ using PaymentService.Dto;
 using PaymentService.Services.Interfaces;
 using Shared.MessageBroker.Publisher.Interfaces;
 using Shared.Models;
+using Shared.Models.Payment;
 using Shared.Repository.Interface;
 
 namespace PaymentService.Services;

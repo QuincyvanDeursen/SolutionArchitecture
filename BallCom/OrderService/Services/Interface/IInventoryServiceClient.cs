@@ -1,5 +1,4 @@
-﻿using OrderService.Domain;
-using OrderService.DTO;
+﻿using OrderService.DTO;
 
 namespace OrderService.Services.Interface
 {

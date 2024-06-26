@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using OrderService.Domain;
 using OrderService.DTO;
 using OrderService.Services.Interface;
 using Shared.Models;
+using Shared.Models.Order;
 
 namespace OrderService.Controllers
 {

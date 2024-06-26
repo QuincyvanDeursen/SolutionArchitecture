@@ -1,6 +1,8 @@
-using Shared.Models;
+using Shared.Models.Customer;
+using Shared.Models.Order;
+using Shared.Models.Payment;
 
-namespace PaymentService.Services.Mapper;
+namespace PaymentService.Services.Mappers;
 
 public static class PaymentRelatedEntityMapper 
 {

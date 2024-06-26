@@ -1,8 +1,8 @@
-﻿using OrderService.Domain;
-using OrderService.DTO;
+﻿using OrderService.DTO;
 using OrderService.Services.Interface;
 using Shared.MessageBroker.Publisher.Interfaces;
 using Shared.Models;
+using Shared.Models.Order;
 using Shared.Repository.Interface;
 
 namespace OrderService.Services
@@ -53,8 +53,9 @@ namespace OrderService.Services
                 OrderItems = orderCreateDto.OrderItems.Select(oi => new OrderItem
                 {
                     OrderId = orderId,
-                    ProductId = oi.ProductId,
-                    Quantity = oi.Quantity
+                    OrderProductId = oi.ProductId,
+                    Quantity = oi.Quantity,
+                    SnapshotPrice = 0 // TODO: Calulate the snapshot price (price * quantity with current product price)
                 }).ToList()
             };
             
@@ -123,7 +124,7 @@ namespace OrderService.Services
             decimal totalPrice = 0;
             foreach (var item in orderItems)
             {
-                var product = await orderProductReadRepository.GetByIdAsync(item.ProductId);
+                var product = await orderProductReadRepository.GetByIdAsync(item.OrderProductId);
                 totalPrice += product.Price * item.Quantity;
             }
             return totalPrice;

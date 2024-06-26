@@ -11,6 +11,7 @@ using Shared.MessageBroker.Consumer.Interfaces;
 using Shared.MessageBroker.Publisher;
 using Shared.MessageBroker.Publisher.Interfaces;
 using Shared.Models;
+using Shared.Models.Payment;
 using Shared.Repository.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
