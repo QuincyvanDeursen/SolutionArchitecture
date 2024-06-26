@@ -1,4 +1,4 @@
-namespace Shared.Models;
+namespace Shared.Models.Payment;
 
 public class PaymentCustomer
 {

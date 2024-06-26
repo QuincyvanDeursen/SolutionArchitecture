@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Text.Json.Serialization;
 
-namespace Shared.Models
+namespace Shared.Models.Order
 {
     public class Order
     {
@@ -9,10 +9,14 @@ namespace Shared.Models
         public string? Address {  get; set; }
         public decimal TotalPrice { get; set; } = 0;
         public OrderStatus Status { get; set; } = OrderStatus.Placed;
-        
-        // Related entities
         public Guid CustomerId { get; init; }
         public Guid? PaymentId { get; set; } 
+        
+        
+        // Payment related entities (eventual consistency)
+        // Can be ignored when serializing as this is specific to payments
         public ICollection<OrderItem> OrderItems { get; init; }
+        public OrderPayment? Payment { get; set; }
+        public OrderCustomer Customer { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-namespace Shared.Models;
+namespace Shared.Models.Order;
 
 public enum OrderStatus
 {

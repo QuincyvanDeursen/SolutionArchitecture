@@ -1,6 +1,4 @@
-using Shared.Models;
-
-namespace OrderService.Domain;
+namespace Shared.Models.Order;
 
 public class OrderProduct
 {

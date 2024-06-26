@@ -1,6 +1,6 @@
-using Shared.Models;
+using Shared.Models.Payment;
 
-namespace OrderService.Domain;
+namespace Shared.Models.Order;
 
 public class OrderPayment
 {

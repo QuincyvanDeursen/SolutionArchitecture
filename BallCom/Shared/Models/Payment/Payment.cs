@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Shared.Models
+namespace Shared.Models.Payment
 {
     public class Payment
     {
@@ -13,11 +13,7 @@ namespace Shared.Models
         
         
         // Payment related entities (eventual consistency)
-        // Can be ignored when serializing as this is specific to payments
-        [JsonIgnore]
-        public PaymentOrder Order { get; set; }  // Navigation property
-        
-        [JsonIgnore]
-        public PaymentCustomer Customer { get; set; }  // Navigation property
+        public PaymentOrder Order { get; set; } 
+        public PaymentCustomer Customer { get; set; }
     }
 }
