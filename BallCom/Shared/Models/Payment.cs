@@ -11,11 +11,13 @@ namespace Shared.Models
         public Guid OrderId { get; init; }
         public Guid CustomerId { get; init; }
         
-        // Ef core navigation properties
+        
+        // Payment related entities (eventual consistency)
+        // Can be ignored when serializing as this is specific to payments
         [JsonIgnore]
-        public PaymentCustomer Customer { get; set; }
+        public PaymentOrder Order { get; set; }  // Navigation property
         
         [JsonIgnore]
-        public PaymentOrder Order { get; set; }
+        public PaymentCustomer Customer { get; set; }  // Navigation property
     }
 }

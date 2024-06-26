@@ -12,8 +12,8 @@ using PaymentService.Database;
 namespace PaymentService.Migrations
 {
     [DbContext(typeof(PaymentDbContext))]
-    [Migration("20240625184225_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240626085758_AddedForeignKeyRelations")]
+    partial class AddedForeignKeyRelations
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -47,6 +47,8 @@ namespace PaymentService.Migrations
 
                     b.HasIndex("CustomerId");
 
+                    b.HasIndex("OrderId");
+
                     b.ToTable("Payments");
                 });
 
@@ -72,6 +74,7 @@ namespace PaymentService.Migrations
             modelBuilder.Entity("Shared.Models.PaymentOrder", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Address")
@@ -89,23 +92,10 @@ namespace PaymentService.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
-
                     b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("Shared.Models.Payment", b =>
-                {
-                    b.HasOne("Shared.Models.PaymentCustomer", "Customer")
-                        .WithMany("Payments")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-                });
-
-            modelBuilder.Entity("Shared.Models.PaymentOrder", b =>
                 {
                     b.HasOne("Shared.Models.PaymentCustomer", "Customer")
                         .WithMany()
@@ -113,26 +103,15 @@ namespace PaymentService.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Shared.Models.Payment", "Payment")
-                        .WithOne("Order")
-                        .HasForeignKey("Shared.Models.PaymentOrder", "Id")
+                    b.HasOne("Shared.Models.PaymentOrder", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Customer");
 
-                    b.Navigation("Payment");
-                });
-
-            modelBuilder.Entity("Shared.Models.Payment", b =>
-                {
-                    b.Navigation("Order")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Shared.Models.PaymentCustomer", b =>
-                {
-                    b.Navigation("Payments");
+                    b.Navigation("Order");
                 });
 #pragma warning restore 612, 618
         }

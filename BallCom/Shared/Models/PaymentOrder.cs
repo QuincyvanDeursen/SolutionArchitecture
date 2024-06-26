@@ -10,8 +10,4 @@ public class PaymentOrder
     
     // Related entities
     public Guid CustomerId { get; set; }
-    
-    public PaymentCustomer Customer { get; set; }
-    
-    public Payment Payment { get; set; }
 }
