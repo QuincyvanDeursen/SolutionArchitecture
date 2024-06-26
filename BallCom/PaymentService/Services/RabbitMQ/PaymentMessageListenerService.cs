@@ -16,10 +16,11 @@ public class PaymentMessageListenerService(IMessageConsumer messageConsumer, ISe
     {
         await messageConsumer.ConsumeAsync(OnMessageReceived, new []
         {
-            "order.create",
-            "order.update",
-            "customer.create",
-            "customer.update",
+            "order.created",
+            "order.cancelled",
+            "order.updated",
+            "customer.created",
+            "customer.updated",
         });
     }
 
@@ -32,19 +33,23 @@ public class PaymentMessageListenerService(IMessageConsumer messageConsumer, ISe
         
         switch (data.Topic)
         {
-            case "customer.create":
+            case "customer.created":
                 var createdCustomer = JsonSerializer.Deserialize<Customer>(data.DataJson);
                 await customerEventHandlerService.ProcessCustomerCreateEvent(PaymentRelatedEntityMapper.MapCustomerToPaymentCustomer(createdCustomer));
                 break;
-            case "customer.update":
+            case "customer.updated":
                 var updatedCustomer = JsonSerializer.Deserialize<Customer>(data.DataJson);
                 await customerEventHandlerService.ProcessCustomerUpdateEvent(PaymentRelatedEntityMapper.MapCustomerToPaymentCustomer(updatedCustomer));
                 break;
-            case "order.create":
+            case "order.created":
                 var createdOrder = JsonSerializer.Deserialize<Order>(data.DataJson);
                 await orderEventHandlerService.ProcessOrderCreateEvent(PaymentRelatedEntityMapper.MapOrderToPaymentOrder(createdOrder));
                 break;
-            case "order.update":
+            case "order.cancelled":
+                var cancelledOrder = JsonSerializer.Deserialize<Order>(data.DataJson);
+                await orderEventHandlerService.ProcessOrderUpdateEvent(PaymentRelatedEntityMapper.MapOrderToPaymentOrder(cancelledOrder));
+                break;
+            case "order.updated":
                 var updatedOrder = JsonSerializer.Deserialize<Order>(data.DataJson);
                 await orderEventHandlerService.ProcessOrderUpdateEvent(PaymentRelatedEntityMapper.MapOrderToPaymentOrder(updatedOrder));
                 break;

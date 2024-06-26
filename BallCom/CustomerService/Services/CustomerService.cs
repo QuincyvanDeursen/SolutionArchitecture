@@ -50,7 +50,7 @@ namespace CustomerService.Services
             await customerRepo.AddCustomer(customer);
             
             // Send event to RabbitMQ
-            await messagePublisher.PublishAsync(customer, "customer.create");
+            await messagePublisher.PublishAsync(customer, "customer.created");
         }
 
         public async Task Update(Guid id, CustomerUpdateDto customer)
@@ -69,7 +69,7 @@ namespace CustomerService.Services
             await customerRepo.UpdateCustomer(existingCustomer);
             
             // Send event to RabbitMQ
-            await messagePublisher.PublishAsync(existingCustomer, "customer.update");
+            await messagePublisher.PublishAsync(existingCustomer, "customer.updated");
         }
     }
 }

@@ -102,26 +102,6 @@ namespace InventoryManagement.Controllers
             }
         }
 
-        [HttpPost("TestOrder")]
-        public async Task<IActionResult> TestDummyOrder(DummyOrder input)
-        {
-            try
-            {
-                foreach (var item in input.Items)
-                {
-                    _logger.LogInformation($"Product Id: {item.ProductId}, Amount: {item.Amount}");
-                    await _commandHandler.Handle(new DecreaseStockCommand(item.ProductId, item.Amount));
-                }
-
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error while handling TestDummyOrder command");
-                return BadRequest();
-            }
-        }
-
         [HttpPost("increasestock")]
         public async Task<IActionResult> IncreaseStock(IncreaseStockCommand command)
         {
@@ -155,12 +135,10 @@ namespace InventoryManagement.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProduct(Guid id, UpdateProductCommand command)
+        public async Task<IActionResult> UpdateProduct(UpdateProductCommand command)
         {
             try
             {
-                command.AggregateId = id;
-
                 await _commandHandler.Handle(command);
 
                 return Ok();

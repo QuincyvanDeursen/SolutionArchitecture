@@ -9,7 +9,8 @@ public interface IEventHandlerService
     // Payment events
     Task ProcessPaymentCreatedEvent(OrderPayment payment);
     Task ProcessPaymentUpdatedEvent(OrderPayment payment);
-    
+    Task ProcessOrderCancelledEvent(OrderPayment payment);
+
     // Customer events
     Task ProcessCustomerCreatedEvent(OrderCustomer customer);
     Task ProcessCustomerUpdatedEvent(OrderCustomer customer);

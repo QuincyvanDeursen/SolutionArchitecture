@@ -27,7 +27,7 @@ namespace OrderService.Services.RabbitMQ.EventHandlers
             await orderWriteRepo.UpdateAsync(order);
             
             // 3. Send a message that a order has been updated
-            await messagePublisher.PublishAsync(order, "order.update");
+            await messagePublisher.PublishAsync(order, "order.updated");
         }
 
         public async Task ProcessPaymentUpdatedEvent(OrderPayment payment)
@@ -45,8 +45,22 @@ namespace OrderService.Services.RabbitMQ.EventHandlers
             await orderWriteRepo.UpdateAsync(order);
             
             // 3. Publish the order status update event
-            await messagePublisher.PublishAsync(order, "order.update");
+            if (order.Status == OrderStatus.Failed)
+            {
+                await messagePublisher.PublishAsync(order, "order.cancelled");
+            }
+            else
+            {
+                await messagePublisher.PublishAsync(order, "order.updated");
+            }
         }
+
+        public async Task ProcessOrderCancelledEvent(OrderPayment payment)
+        {
+            // 1. Update the payment
+            await paymentWriteRepo.UpdateAsync(payment);
+        }
+
         public async Task ProcessCustomerCreatedEvent(OrderCustomer customer)
         {
             // 1. Create a new customer (eventual consistency)

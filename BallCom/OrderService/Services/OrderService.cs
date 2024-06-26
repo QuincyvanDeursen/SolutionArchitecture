@@ -70,7 +70,7 @@ namespace OrderService.Services
             await orderWriteRepository.CreateAsync(order);
             
             // 5. Send a message that a new order has been placed
-            await messagePublisher.PublishAsync(order, "order.create");
+            await messagePublisher.PublishAsync(order, "order.created");
         }
 
         public async Task UpdateOrder(Guid id, OrderUpdateDto newOrder)
@@ -111,7 +111,14 @@ namespace OrderService.Services
             await orderWriteRepository.UpdateAsync(existingOrder);
             
             // 4. Send a message that the order has been updated
-            await messagePublisher.PublishAsync(existingOrder, "order.update");
+            if (newOrder.Status == OrderStatus.Failed)
+            {
+                await messagePublisher.PublishAsync(existingOrder, "order.cancelled");
+            }
+            else
+            {
+                await messagePublisher.PublishAsync(existingOrder, "order.updated");
+            }
         }
 
         private async Task<bool> AllOrderProductsExist(ICollection<OrderItemDto> orderItems)

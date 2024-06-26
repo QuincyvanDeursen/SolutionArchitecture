@@ -10,9 +10,9 @@ namespace InventoryManagement.CQRS.Commands
         public decimal Price { get; set; }
         public int Stock { get; set; }
 
-        public UpdateProductCommand(Guid id, string name, string description, decimal price, int stock)
+        public UpdateProductCommand(Guid aggregateId, string name, string description, decimal price, int stock)
         {
-            AggregateId = id;
+            AggregateId = aggregateId;
             Name = name;
             Description = description;
             Price = price;

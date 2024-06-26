@@ -49,9 +49,10 @@ namespace InventoryManagement.CQRS.Commands.Handler
             //Loos event als product niet bestaat
             if (product == null) throw new Exception("Product not found");
 
+            var newProduct = new Product(command.AggregateId, command.Name, command.Description, command.Price, command.Stock);
+
             //Sla het event op (aggregateId is het Id van het product)
-            var @event = new ProductUpdatedEvent(product.Id,
-                new Product(command.AggregateId, command.Name, command.Description, command.Price, command.Stock));
+            var @event = new ProductUpdatedEvent(product.Id, newProduct);
             await _eventStore.CreateAsync(@event);
 
             //Publiceer het event naar de message broker
@@ -95,11 +96,14 @@ namespace InventoryManagement.CQRS.Commands.Handler
             if (product.Stock < command.Amount) throw new Exception("Not enough stock available");
 
             // Verlaag de stock van het product
-            product.Stock -= command.Amount;
+            product.Stock = command.Amount;
 
             // Sla het event op
             var @event = new StockDecreasedEvent(product.Id, product);
             await _eventStore.CreateAsync(@event);
+
+            // Publiceer het event naar de message broker
+            await _messagePublisher.PublishAsync(@event.Product, "product.stockdecreased");
         }
     }
 }

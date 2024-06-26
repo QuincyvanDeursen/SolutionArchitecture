@@ -18,12 +18,13 @@ public class OrderMessageListenerService(IMessageConsumer messageConsumer, IServ
     {
         await messageConsumer.ConsumeAsync(OnMessageReceived, new []
         {
-            "customer.create",
-            "customer.update",
-            "payment.create",
-            "payment.update",
-            "product.create",
-            "product.update"
+            "customer.created",
+            "customer.updated",
+            "payment.created",
+            "payment.updated",
+            "payment.cancelled",
+            "product.created",
+            "product.updated"
         });
     }
 
@@ -35,27 +36,31 @@ public class OrderMessageListenerService(IMessageConsumer messageConsumer, IServ
 
         switch (data.Topic)
         {
-            case "customer.create":
+            case "customer.created":
                 var createCustomer = JsonSerializer.Deserialize<Customer>(data.DataJson);
                 await eventHandlerService.ProcessCustomerCreatedEvent(createCustomer.ToOrderCustomer());
                 break;
-            case "customer.update":
+            case "customer.updated":
                 var updateCustomer = JsonSerializer.Deserialize<Customer>(data.DataJson);
                 await eventHandlerService.ProcessCustomerUpdatedEvent(updateCustomer.ToOrderCustomer());
                 break;
-            case "payment.create":
+            case "payment.created":
                 var createPayment = JsonSerializer.Deserialize<Payment>(data.DataJson);
                 await eventHandlerService.ProcessPaymentCreatedEvent(createPayment.ToOrderPayment());
                 break;
-            case "payment.update":
+            case "payment.updated":
                 var updatePayment = JsonSerializer.Deserialize<Payment>(data.DataJson);
                 await eventHandlerService.ProcessPaymentUpdatedEvent(updatePayment.ToOrderPayment());
                 break;
-            case "product.create":
+            case "payment.cancelled":
+                var cancelPayment = JsonSerializer.Deserialize<Payment>(data.DataJson);
+                await eventHandlerService.ProcessOrderCancelledEvent(cancelPayment.ToOrderPayment());
+                break;
+            case "product.created":
                 var createProduct = JsonSerializer.Deserialize<Product>(data.DataJson);
                 await eventHandlerService.ProcessProductCreatedEvent(createProduct.ToOrderProduct());
                 break;
-            case "product.update":
+            case "product.updated":
                 var updateProduct = JsonSerializer.Deserialize<Product>(data.DataJson);
                 await eventHandlerService.ProcessProductUpdatedEvent(updateProduct.ToOrderProduct());
                 break;
