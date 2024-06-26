@@ -1,4 +1,5 @@
-﻿using OrderService.Database;
+﻿using Microsoft.EntityFrameworkCore;
+using OrderService.Database;
 using Shared.Models;
 using Shared.Models.Order;
 using Shared.Repository.Interface;
@@ -15,7 +16,16 @@ namespace OrderService.Repository
 
         public async Task UpdateAsync(OrderPayment entity)
         {
-            context.Payments.Update(entity);
+            var oldPayment = await context.Payments.FirstOrDefaultAsync(p => p.Id == entity.Id);
+            if(oldPayment == null)
+            {
+                throw new KeyNotFoundException("Payment was not found in the order database");
+            }
+            
+            // Update only changeable fields
+            oldPayment.Status = entity.Status;
+            
+            context.Payments.Update(oldPayment);
             await context.SaveChangesAsync();
         }
     }

@@ -18,19 +18,19 @@ namespace OrderService.Database
         {
             // Configure the composite primary key for OrderItem
             modelBuilder.Entity<OrderItem>()
-                .HasKey(oi => new { oi.OrderProductId, oi.OrderId });
+                .HasKey(oi => new { oi.ProductId, oi.OrderId });
             
             // Configure the many-to-many relationship between Order and OrderItem
             modelBuilder.Entity<Order>()
                 .HasMany(o => o.OrderItems)
-                .WithOne()
+                .WithOne(oi => oi.Order)
                 .HasForeignKey(oi => oi.OrderId);
             
             // Configure the many-to-many relationship between Product and OrderItem
             modelBuilder.Entity<OrderProduct>()
                 .HasMany(p => p.OrderItems)
-                .WithOne()
-                .HasForeignKey(oi => oi.OrderProductId);
+                .WithOne(oi => oi.Product)
+                .HasForeignKey(oi => oi.ProductId);
             
             // Configure the optional relationship between Order and OrderPayment
             modelBuilder.Entity<Order>()

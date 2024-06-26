@@ -10,7 +10,12 @@ public class OrderReadRepo(OrderDbContext context) : IReadRepository<Order>
 {
     public async Task<Order> GetByIdAsync(Guid id)
     {
-        return await context.Orders.FirstOrDefaultAsync(p => p.Id == id);
+        return await context.Orders
+            .Include(o => o.Customer)
+            .Include(o => o.Payment)
+            .Include(o => o.OrderItems)
+            .ThenInclude(oi => oi.Product)
+            .FirstOrDefaultAsync(p => p.Id == id);
     }
 
     public async Task<IEnumerable<Order>> GetAllAsync()
@@ -18,6 +23,8 @@ public class OrderReadRepo(OrderDbContext context) : IReadRepository<Order>
         return await context.Orders
             .Include(o => o.Customer)
             .Include(o => o.Payment)
+            .Include(o => o.OrderItems)
+            .ThenInclude(oi => oi.Product)
             .ToListAsync();
     }
 }

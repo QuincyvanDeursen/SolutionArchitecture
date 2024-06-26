@@ -53,13 +53,18 @@ namespace OrderService.Services
                 OrderItems = orderCreateDto.OrderItems.Select(oi => new OrderItem
                 {
                     OrderId = orderId,
-                    OrderProductId = oi.ProductId,
-                    Quantity = oi.Quantity,
-                    SnapshotPrice = 0 // TODO: Calulate the snapshot price (price * quantity with current product price)
+                    ProductId = oi.ProductId,
+                    Quantity = oi.Quantity
                 }).ToList()
             };
             
+            order.OrderItems.ToList().ForEach(async i =>
+            {
+                i.SnapshotPrice = await GetSnapshotPrice(i.ProductId);
+            });
+            
             order.TotalPrice = await GetTotalOrderPrice(order.OrderItems);
+            
             
             // 4. Save order to database
             await orderWriteRepository.CreateAsync(order);
@@ -96,7 +101,7 @@ namespace OrderService.Services
             if (newOrder.Status != OrderStatus.Shipped && newOrder.Status != OrderStatus.Delivered &&
                 newOrder.Status != OrderStatus.Failed)
             {
-                throw new ArgumentException("Changing to this order status is not allowed directly");
+                throw new ArgumentException($"Changing from {existingOrder.Status} to status {newOrder.Status} is not allowed directly");
             }
             
             // 3. Update only the status
@@ -124,10 +129,16 @@ namespace OrderService.Services
             decimal totalPrice = 0;
             foreach (var item in orderItems)
             {
-                var product = await orderProductReadRepository.GetByIdAsync(item.OrderProductId);
+                var product = await orderProductReadRepository.GetByIdAsync(item.ProductId);
                 totalPrice += product.Price * item.Quantity;
             }
             return totalPrice;
+        }
+        
+        private async Task<decimal> GetSnapshotPrice(Guid productId)
+        {
+            var product = await orderProductReadRepository.GetByIdAsync(productId);
+            return product.Price;
         }
     }
 }
