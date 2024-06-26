@@ -1,9 +1,11 @@
+using System.Text.Json;
 using InventoryManagement.Domain;
 using Microsoft.AspNetCore.Mvc;
 using InventoryManagement.CQRS.Queries;
 using InventoryManagement.CQRS.Commands;
 using InventoryManagement.CQRS.Commands.Handler;
 using InventoryManagement.CQRS.Queries.Interfaces;
+using Shared.Models;
 
 namespace InventoryManagement.Controllers
 {
@@ -59,7 +61,7 @@ namespace InventoryManagement.Controllers
         }
 
         [HttpPost("checkstock")]
-        public async Task<ActionResult> CheckStock([FromBody] List<Product> input)
+        public async Task<ActionResult> CheckStock([FromBody] List<CheckStock> input)
         {
             try
             {
@@ -69,20 +71,24 @@ namespace InventoryManagement.Controllers
 
                 foreach (var productItem in input)
                 {
-                    var product = await _getProductHandler.Handle(new GetProductQuery(productItem.Id));
+                    var product = await _getProductHandler.Handle(new GetProductQuery(productItem.ProductId));
+                    Console.WriteLine(JsonSerializer.Serialize(product));
+                    Console.WriteLine(JsonSerializer.Serialize(productItem));
 
-                    if (product.Stock < productItem.Stock)
+                    if (product.Stock < productItem.Quantity)
                     {
                         stock = false;
                         break;
                     }
                 }
+                
+                Console.WriteLine("Got here");
 
                 return Ok(stock);
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                return BadRequest(e);
             }
         }
 

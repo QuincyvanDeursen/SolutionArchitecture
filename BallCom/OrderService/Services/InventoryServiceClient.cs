@@ -2,6 +2,8 @@
 using OrderService.Services.Interface;
 using OrderService.DTO;
 using System.Text;
+using Shared.Models;
+using Shared.Models.Inventory;
 
 namespace OrderService.Services
 {
@@ -20,7 +22,8 @@ namespace OrderService.Services
         {
             try
             {
-                var json = JsonConvert.SerializeObject(productsFromOrder);
+                var productList = productsFromOrder.Select(x => new CheckStock() {ProductId = x.ProductId, Quantity = x.Quantity}).ToList();
+                var json = JsonConvert.SerializeObject(productList);
                 var data = new StringContent(json, Encoding.UTF8, "application/json");
                 var response = await _httpClient.PostAsync("http://host.docker.internal:3002/api/Product/checkstock", data);
                 response.EnsureSuccessStatusCode(); // This ensures the HTTP status code is success (2xx range)
@@ -30,7 +33,6 @@ namespace OrderService.Services
 
                 return checkStockResult;
             }
-            
             catch (Exception ex)
             {
                 // Handle other exceptions specific to your application logic

@@ -12,8 +12,8 @@ using OrderService.Database;
 namespace OrderService.Migrations
 {
     [DbContext(typeof(OrderDbContext))]
-    [Migration("20240626150624_OrderInit")]
-    partial class OrderInit
+    [Migration("20240626192238_OrderCompositeKey")]
+    partial class OrderCompositeKey
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -91,13 +91,16 @@ namespace OrderService.Migrations
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
                     b.Property<decimal>("SnapshotPrice")
                         .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("ProductId", "OrderId");
+                    b.HasKey("ProductId", "OrderId", "Id");
 
                     b.HasIndex("OrderId");
 

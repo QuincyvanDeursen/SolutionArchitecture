@@ -8,8 +8,8 @@ namespace OrderService.Repository;
 public class OrderWriteRepo(OrderDbContext context) : IWriteRepository<Order>
 {
     public async Task CreateAsync(Order entity)
-    {
-        await context.Orders.AddAsync(entity);
+    { 
+        context.Orders.Add(entity);
         await context.SaveChangesAsync();
     }
 

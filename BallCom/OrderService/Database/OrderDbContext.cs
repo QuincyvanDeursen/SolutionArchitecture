@@ -18,7 +18,7 @@ namespace OrderService.Database
         {
             // Configure the composite primary key for OrderItem
             modelBuilder.Entity<OrderItem>()
-                .HasKey(oi => new { oi.ProductId, oi.OrderId });
+                .HasKey(oi => new { oi.ProductId, oi.OrderId, oi.Id });
             
             // Configure the many-to-many relationship between Order and OrderItem
             modelBuilder.Entity<Order>()

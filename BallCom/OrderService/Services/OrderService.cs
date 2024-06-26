@@ -34,7 +34,6 @@ namespace OrderService.Services
                 throw new ArgumentException("You can only order a maximum of 20 items at a time");
             
             // 2. Check if all products are in stock
-            // TODO: Re-enable this check after fixing the inventory service
             // if (!await inventoryServiceClient.CheckStockAsync(orderCreateDto.OrderItems))
             //     throw new Exception("One or more products are not in stock");
             
@@ -57,11 +56,11 @@ namespace OrderService.Services
                     Quantity = oi.Quantity
                 }).ToList()
             };
-            
-            order.OrderItems.ToList().ForEach(async i =>
+
+            foreach (var item in order.OrderItems)
             {
-                i.SnapshotPrice = await GetSnapshotPrice(i.ProductId);
-            });
+                item.SnapshotPrice = await GetSnapshotPrice(item.ProductId);
+            }
             
             order.TotalPrice = await GetTotalOrderPrice(order.OrderItems);
             
@@ -104,9 +103,9 @@ namespace OrderService.Services
                 throw new ArgumentException($"Changing from {existingOrder.Status} to status {newOrder.Status} is not allowed directly");
             }
 
-            if(existingOrder.Status == OrderStatus.Failed || existingOrder.Status == OrderStatus.Placed)
+            if(existingOrder.Status == OrderStatus.Failed)
             {
-                throw new InvalidOperationException("Order status cannot be updated after it has been failed or is pending");
+                throw new InvalidOperationException("Order status cannot be updated after it has been failed");
             }
 
             // 3. Update only the status
