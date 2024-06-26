@@ -1,6 +1,4 @@
-﻿using Shared.EventSourcing;
-
-namespace Shared.Repository.Interface
+﻿namespace Shared.Repository.Interface
 {
     public interface IWriteRepository<in T>
     {

@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using OrderService.Domain;
 using OrderService.DTO;
 using OrderService.Services.Interface;
+using Shared.Models;
+using Shared.Models.Order;
 
 namespace OrderService.Controllers
 {
@@ -19,22 +20,34 @@ namespace OrderService.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Order>> Get()
+        public async Task<IActionResult> Get()
         {
-            return await _orderService.GetAllOrders();
+            try
+            {
+                return Ok(await _orderService.GetAllOrders());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading order list");
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Order> Get(Guid id)
+        public async Task<ActionResult<Order>> Get(Guid id)
         {
-            var order = _orderService.GetOrderById(id);
-
-            if (order == null)
+            try
             {
-                return NotFound(); 
-            }
+                var order = await _orderService.GetOrderById(id);
+                if (order == null) return NotFound(); 
 
-            return Ok(order);
+                return Ok(order);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error loading single order with id: {id}");
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost]
@@ -48,7 +61,7 @@ namespace OrderService.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing order");
-                return BadRequest("Error processing order, certain items might be out of stock");
+                return BadRequest(ex.Message);
             }
         }
 
@@ -66,9 +79,10 @@ namespace OrderService.Controllers
                 return BadRequest("Error updating order");
             }
         }
-
+        
+        
         [HttpPut("{id}/status")]
-        public async Task<ActionResult> UpdateOrderStatus(Guid id, [FromBody] OrderStatusUpdateDto order)
+        public async Task<ActionResult> UpdateOrderStatus(Guid id, [FromBody] OrderUpdateStatusDto order)
         {
             try
             {
