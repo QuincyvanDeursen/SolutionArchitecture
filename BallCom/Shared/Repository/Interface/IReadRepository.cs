@@ -10,5 +10,7 @@ namespace Shared.Repository.Interface
     {
         Task<T> GetByIdAsync(Guid id);
         Task<IEnumerable<T>> GetAllAsync();
+
+        Task<IEnumerable<T>> GetAllByIdAsync(Guid aggergateId);
     }
 }

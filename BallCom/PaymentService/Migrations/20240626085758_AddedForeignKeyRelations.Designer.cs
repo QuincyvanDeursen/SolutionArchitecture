@@ -11,9 +11,15 @@ using PaymentService.Database;
 
 namespace PaymentService.Migrations
 {
+<<<<<<<< HEAD:BallCom/OrderService/Migrations/20240625190525_initialCreate.Designer.cs
+    [DbContext(typeof(AppDbContext))]
+    [Migration("20240625190525_initialCreate")]
+    partial class initialCreate
+========
     [DbContext(typeof(PaymentDbContext))]
     [Migration("20240626085758_AddedForeignKeyRelations")]
     partial class AddedForeignKeyRelations
+>>>>>>>> main:BallCom/PaymentService/Migrations/20240626085758_AddedForeignKeyRelations.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

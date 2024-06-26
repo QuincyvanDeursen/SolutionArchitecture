@@ -5,17 +5,17 @@ WORKDIR /src
 # Copy the solution and project files onto the container
 COPY ./*.sln ./
 COPY ./Shared/Shared.csproj ./Shared/
-COPY ./InventoryService/InventoryService.csproj ./InventoryService/
+COPY ./InventoryManagement/InventoryManagement.csproj ./InventoryManagement/
 
 # Restore the dependencies
-RUN dotnet restore ./InventoryService/InventoryService.csproj
+RUN dotnet restore ./InventoryManagement/InventoryManagement.csproj
 
 # Copy the rest of the application code
-COPY ./InventoryService ./InventoryService
+COPY ./InventoryManagement ./InventoryManagement
 COPY ./Shared ./Shared
 
 # Build and Publish the application
-WORKDIR /src/InventoryService
+WORKDIR /src/InventoryManagement
 RUN dotnet build -c Release -o /app/build
 RUN dotnet publish -c Release -o /app/publish
 
@@ -28,4 +28,4 @@ COPY --from=build /app/publish ./
 EXPOSE 3002
 
 # Start the application
-ENTRYPOINT ["dotnet", "InventoryService.dll"]
+ENTRYPOINT ["dotnet", "InventoryManagement.dll"]
