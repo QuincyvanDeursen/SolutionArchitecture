@@ -1,11 +1,12 @@
 using Shared.Models;
 using Shared.Models.Customer;
+using Shared.Models.Inventory;
 using Shared.Models.Order;
 using Shared.Models.Payment;
 
 namespace OrderService.Services.Mappers;
 
-public static class OrderRelatedEntityMapper
+public static class OrderEntityMapperExtensions
 {
     public static OrderPayment ToOrderPayment(this Payment payment)
     {
@@ -26,6 +27,16 @@ public static class OrderRelatedEntityMapper
             Name = $"{customer.FirstName} {customer.LastName}",
             Address = customer.Address,
             PhoneNumber = customer.PhoneNumber
+        };
+    }
+    
+    public static OrderProduct ToOrderProduct(this Product product)
+    {
+        return new OrderProduct
+        {
+            Id = product.Id,
+            Name = product.Name,
+            Price = product.Price
         };
     }
 }
